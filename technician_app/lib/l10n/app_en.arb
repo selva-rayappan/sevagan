@@ -1,0 +1,19 @@
+{
+  "appTitle": "Sevagan Technician",
+  "loginTitle": "Login",
+  "loginSubtitle": "Enter your mobile number to continue",
+  "phoneLabel": "Mobile Number",
+  "sendOtp": "Send OTP",
+  "verifyOtp": "Verify OTP",
+  "homeTitle": "Dashboard",
+  "online": "Online",
+  "offline": "Offline",
+  "newJobRequest": "New Job Request",
+  "accept": "Accept",
+  "reject": "Reject",
+  "jobDetails": "Job Details",
+  "startJob": "Start Job",
+  "completeJob": "Complete Job",
+  "earnings": "Earnings",
+  "profile": "Profile"
+}

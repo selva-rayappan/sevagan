@@ -1,0 +1,18 @@
+{
+  "@@locale": "en",
+  "appTitle": "Sevagan",
+  "login": "Login",
+  "phoneNumber": "Phone Number",
+  "sendOtp": "Send OTP",
+  "verifyOtp": "Verify OTP",
+  "enterOtp": "Enter OTP",
+  "selectService": "Select Service",
+  "serviceLocation": "Service Location",
+  "requestService": "Request Service",
+  "myRequests": "My Requests",
+  "jobDetails": "Job Details",
+  "rateService": "Rate Service",
+  "payment": "Payment",
+  "cashPayment": "Cash Payment",
+  "upiPayment": "UPI Payment"
+}

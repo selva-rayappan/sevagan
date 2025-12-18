@@ -1,0 +1,18 @@
+{
+  "@@locale": "ta",
+  "appTitle": "சேவகன்",
+  "login": "உள்நுழைய",
+  "phoneNumber": "தொலைபேசி எண்",
+  "sendOtp": "OTP அனுப்பு",
+  "verifyOtp": "OTP சரிபார்க்கவும்",
+  "enterOtp": "OTP உள்ளிடவும்",
+  "selectService": "சேவையைத் தேர்ந்தெடுக்கவும்",
+  "serviceLocation": "சேவை இடம்",
+  "requestService": "சேவை கோரிக்கை",
+  "myRequests": "எனது கோரிக்கைகள்",
+  "jobDetails": "வேலை விவரங்கள்",
+  "rateService": "சேவையை மதிப்பிடுங்கள்",
+  "payment": "கட்டணம்",
+  "cashPayment": "பண கட்டணம்",
+  "upiPayment": "UPI கட்டணம்"
+}

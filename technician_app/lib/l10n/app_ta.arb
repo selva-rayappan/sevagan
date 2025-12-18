@@ -1,0 +1,19 @@
+{
+  "appTitle": "சேவகன்",
+  "loginTitle": "உள்நுழைய",
+  "loginSubtitle": "தொடர உங்கள் மொபைல் எண்ணை உள்ளிடவும்",
+  "phoneLabel": "மொபைல் எண்",
+  "sendOtp": "OTP அனுப்பு",
+  "verifyOtp": "OTP சரிபார்",
+  "homeTitle": "முகப்பு",
+  "online": "ஆன்லைன்",
+  "offline": "ஆஃப்லைன்",
+  "newJobRequest": "புதிய வேலை",
+  "accept": "ஏற்றுக்கொள்",
+  "reject": "நிராகரி",
+  "jobDetails": "வேலை விவரங்கள்",
+  "startJob": "வேலையைத் தொடங்கு",
+  "completeJob": "வேலையை முடி",
+  "earnings": "வருமானம்",
+  "profile": "விவரக்குறிப்பு"
+}

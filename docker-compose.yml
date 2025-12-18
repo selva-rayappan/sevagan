@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: sevagan-postgres
+    environment:
+      POSTGRES_DB: sevagan
+      POSTGRES_USER: sevagan_user
+      POSTGRES_PASSWORD: sevagan_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sevagan-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: sevagan-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - sevagan-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sevagan-backend
+    environment:
+      NODE_ENV: development
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: sevagan
+      DATABASE_USER: sevagan_user
+      DATABASE_PASSWORD: sevagan_password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: your-jwt-secret-change-in-production
+      JWT_EXPIRATION: 7d
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - sevagan-network
+    command: npm run start:dev
+
+  admin-panel:
+    build:
+      context: ./admin-panel
+      dockerfile: Dockerfile.dev
+    container_name: sevagan-admin
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./admin-panel:/app
+      - /app/node_modules
+    networks:
+      - sevagan-network
+    command: npm run dev
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  sevagan-network:
+    driver: bridge
