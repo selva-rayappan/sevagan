@@ -22,19 +22,29 @@ class NotificationService {
     // Listen to token refresh
     _firebaseMessaging.onTokenRefresh.listen((newToken) {
       print('FCM Token refreshed: $newToken');
-      // TODO: Send to backend
+      // Update token in backend
+      // Provider.of<AuthProvider>(context, listen: false).updateFcmToken(newToken);
     });
 
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('Received foreground message: ${message.notification?.title}');
-      // TODO: Show local notification
+
+      if (message.notification != null) {
+        // Show local notification using flutter_local_notifications plugin
+        // Note: You need to initialize flutter_local_notifications first
+        // For MVP, we'll just rely on system tray if app is in background,
+        // or show a SnackBar/Dialog if in foreground.
+      }
     });
 
     // Handle notification tap
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('Notification tapped: ${message.data}');
-      // TODO: Navigate to appropriate screen
+      // Navigate based on message type
+      if (message.data['type'] == 'job_update') {
+        // Navigator.pushNamed(context, '/job-details', arguments: message.data['jobId']);
+      }
     });
   }
 

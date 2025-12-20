@@ -110,7 +110,7 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            Switch(value: true, onChanged: (val) {}, activeColor: Colors.white),
+            Switch(value: true, onChanged: (val) {}, activeThumbColor: Colors.white),
           ],
         ),
       ),
