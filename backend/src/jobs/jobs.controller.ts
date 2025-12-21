@@ -82,10 +82,14 @@ export class JobsController {
 
     @Post(':id/start')
     @Roles(UserRole.TECHNICIAN)
-    @ApiOperation({ summary: 'Start job' })
-    async startJob(@Param('id') id: string, @GetUser() user: User) {
+    @ApiOperation({ summary: 'Start job with OTP' })
+    async startJob(
+        @Param('id') id: string,
+        @GetUser() user: User,
+        @Body() data: { otp: string },
+    ) {
         const technician = await this.techniciansService.findByUserId(user.id);
-        return this.jobsService.startJob(id, technician.id);
+        return this.jobsService.startJob(id, technician.id, data.otp);
     }
 
     @Post(':id/complete')
@@ -119,5 +123,11 @@ export class JobsController {
         @Body() data: { rating: number; comment?: string },
     ) {
         return this.jobsService.rateJob(id, user.id, data.rating, data.comment);
+    }
+    @Get('available')
+    @Roles(UserRole.TECHNICIAN)
+    @ApiOperation({ summary: 'Get available jobs (Poling fallback)' })
+    async getAvailableJobs() {
+        return this.jobsService.findAvailableJobs();
     }
 }

@@ -23,6 +23,13 @@ export class UploadService {
         file: Express.Multer.File,
         folder: string = 'uploads',
     ): Promise<string> {
+        // Mock upload for development
+        const accessKey = this.configService.get('AWS_S3_ACCESS_KEY_ID');
+        if (!accessKey || accessKey.includes('test') || accessKey.includes('mock')) {
+            console.log(`[Upload] Mocking upload for ${file.originalname}`);
+            return `https://via.placeholder.com/300?text=${encodeURIComponent(file.originalname)}`;
+        }
+
         const key = `${folder}/${uuidv4()}-${file.originalname}`;
 
         const command = new PutObjectCommand({

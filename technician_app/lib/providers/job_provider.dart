@@ -1,35 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../core/constants.dart';
 import '../data/models/job_model.dart';
 
 class JobProvider with ChangeNotifier {
-  final List<Job> _jobs = [
-    Job(
-      id: '1',
-      customerName: 'John Doe',
-      serviceType: 'AC Repair',
-      description: 'AC not cooling properly',
-      address: '123, Main Street, Chennai',
-      latitude: 13.0827,
-      longitude: 80.2707,
-      price: 500,
-      createdAt: DateTime.now(),
-      status: JobStatus.pending,
-    ),
-    Job(
-      id: '2',
-      customerName: 'Jane Smith',
-      serviceType: 'Plumbing',
-      description: 'Leaking tap in kitchen',
-      address: '45, Anna Nagar, Chennai',
-      latitude: 13.0850,
-      longitude: 80.2100,
-      price: 300,
-      createdAt: DateTime.now().subtract(const Duration(minutes: 30)),
-      status: JobStatus.pending,
-    ),
-  ];
+  List<Job> _jobs = [];
+  bool _isLoading = false;
 
   List<Job> get jobs => _jobs;
+  bool get isLoading => _isLoading;
 
   List<Job> get pendingJobs =>
       _jobs.where((job) => job.status == JobStatus.pending).toList();
@@ -40,36 +20,67 @@ class JobProvider with ChangeNotifier {
       )
       .toList();
 
-  void acceptJob(String jobId) {
-    final index = _jobs.indexWhere((job) => job.id == jobId);
-    if (index != -1) {
-      _jobs[index].status = JobStatus.accepted;
+  Future<void> fetchAvailableJobs() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+      
+      if (token == null) return;
+
+      final response = await Dio().get(
+        '${ApiConstants.baseUrl}/jobs/available',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        // Map response to Job model (assuming Job model matches API response or Needs adaptation)
+        // For MVP, simplistic mapping:
+        _jobs = data.map((json) => Job(
+          id: json['id'],
+          customerName: json['customer']?['name'] ?? 'Unknown Customer',
+          serviceType: json['serviceCategory']?['name'] ?? 'Service',
+          description: json['description'],
+          address: json['locationAddress'] ?? 'Unknown Location',
+          latitude: (json['locationLat'] as num).toDouble(),
+          longitude: (json['locationLng'] as num).toDouble(),
+          price: (json['estimatedPrice'] as num).toDouble(),
+          createdAt: DateTime.parse(json['createdAt']),
+          status: JobStatus.pending, // Explicitly set as pending for this list
+        )).toList();
+      }
+    } catch (e) {
+      print('Error fetching jobs: $e');
+    } finally {
+      _isLoading = false;
       notifyListeners();
     }
   }
 
-  void rejectJob(String jobId) {
-    final index = _jobs.indexWhere((job) => job.id == jobId);
-    if (index != -1) {
-      _jobs[index].status = JobStatus.cancelled;
-      // In real app, might just remove from list or mark rejected
-      notifyListeners();
+  Future<bool> acceptJob(String jobId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
+
+      await Dio().post(
+         '${ApiConstants.baseUrl}/jobs/$jobId/accept',
+         options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      // Refresh jobs
+      await fetchAvailableJobs();
+      return true;
+    } catch (e) {
+      print('Error accepting job: $e');
+      return false;
     }
   }
 
-  void startJob(String jobId) {
-    final index = _jobs.indexWhere((job) => job.id == jobId);
-    if (index != -1) {
-      _jobs[index].status = JobStatus.started;
-      notifyListeners();
-    }
-  }
-
-  void completeJob(String jobId) {
-    final index = _jobs.indexWhere((job) => job.id == jobId);
-    if (index != -1) {
-      _jobs[index].status = JobStatus.completed;
-      notifyListeners();
-    }
-  }
+  // TODO: Implement reject/start/complete similarly
+  void rejectJob(String jobId) {}
+  void startJob(String jobId) {}
+  void completeJob(String jobId) {}
 }

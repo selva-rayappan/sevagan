@@ -128,4 +128,52 @@ class ApiService {
       throw Exception('Failed to rate job');
     }
   }
+  // Payments
+  Future<Map<String, dynamic>> createPayment(
+    String token,
+    String serviceRequestId,
+    String method,
+  ) async {
+    final response = await http.post(
+      Uri.parse('${ApiConfig.baseUrl}${ApiConfig.createPayment}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'serviceRequestId': serviceRequestId,
+        'method': method,
+      }),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create payment');
+    }
+
+    return jsonDecode(response.body);
+  }
+
+  Future<void> verifyPayment(
+    String token,
+    String paymentId,
+    String razorpayPaymentId,
+    String razorpaySignature,
+  ) async {
+    final response = await http.post(
+      Uri.parse('${ApiConfig.baseUrl}${ApiConfig.verifyPayment}'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'paymentId': paymentId,
+        'razorpayPaymentId': razorpayPaymentId,
+        'razorpaySignature': razorpaySignature,
+      }),
+    );
+
+    if (response.statusCode != 201) {
+      throw Exception('Failed to verify payment');
+    }
+  }
 }

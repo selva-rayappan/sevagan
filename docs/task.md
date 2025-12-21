@@ -1,0 +1,52 @@
+# Task List
+
+- [/] Phase 1: Foundation Setup (Code Complete - Runtime Blocked) <!-- id: 0 -->
+    - [x] Create `.env` files for all components <!-- id: 1 -->
+        - [x] Backend (`backend/.env`) <!-- id: 1.1 -->
+        - [x] Customer App (`customer_app/.env`) <!-- id: 1.2 -->
+        - [x] Technician App (`technician_app/.env`) <!-- id: 1.3 -->
+        - [x] Admin Panel (`admin-panel/.env`) <!-- id: 1.4 -->
+    - [-] Database Initialization (Skipped: Docker unavailable, switching to AWS) <!-- id: 2 -->
+        - [-] Start PostgreSQL and Redis (Docker Compose) <!-- id: 2.1 -->
+        - [ ] AWS Infrastructure Setup <!-- id: 2.5 -->
+            - [ ] Create RDS PostgreSQL Instance <!-- id: 2.5.1 -->
+            - [ ] Create ElastiCache Redis Instance <!-- id: 2.5.2 -->
+            - [ ] Update `backend/.env` with AWS Config <!-- id: 2.5.3 -->
+            - [ ] Run migrations on AWS RDS <!-- id: 2.5.4 -->
+        - [ ] Seed data for service categories <!-- id: 2.4 -->
+    - [-] Firebase Configuration (Deferred: Requires interactive login) <!-- id: 3 -->
+        - [-] Generate `firebase_options.dart` <!-- id: 3.1 -->
+    - [/] OTP Authentication Implementation (Code Complete, Verification Deferred) <!-- id: 4 -->
+        - [x] Backend: OTP Generation & SMS Integration (Mock) <!-- id: 4.1 -->
+        - [x] Backend: OTP Verification & JWT Issue <!-- id: 4.2 -->
+        - [/] Mobile: Login Screen Connection <!-- id: 4.3 -->
+            - [x] Technician App (Connected to API via Dio) <!-- id: 4.3.1 -->
+            - [-] Customer App (Skipped: Missing Android/iOS folders) <!-- id: 4.3.2 -->
+- [/] Phase 2: Core Job Flow <!-- id: 5 -->
+    - [/] Backend: Service Categories & Seeding (Implemented, Verification Deferred) <!-- id: 5.1 -->
+    - [/] Backend: Service Request API (Create, List) (Implemented, Verification Deferred) <!-- id: 5.2 -->
+    - [/] Backend: Job Matching Logic (Geo-spatial search) (Implemented using Haversine) <!-- id: 5.3 -->
+    - [/] Customer App: Service Selection UI (Implemented, Verification Deferred) <!-- id: 5.4 -->
+    - [/] Customer App: Create Request Flow (Implemented, Verification Deferred) <!-- id: 5.5 -->
+    - [/] Technician App: Job Notification & Acceptance (Polling Implemented) <!-- id: 5.6 -->
+- [/] Phase 3: Job Execution <!-- id: 6 -->
+    - [/] Technician App: Start Job (OTP Verification) (Implemented, Verification Deferred) <!-- id: 6.1 -->
+    - [/] Technician App: Complete Job (Photo Upload & Price Input) (Implemented, Verification Deferred) <!-- id: 6.2 -->
+    - [/] Customer App: Job Status Tracking Screen (Implemented, Verification Deferred) <!-- id: 6.3 -->
+    - [/] Backend: Job Status State Machine & Validation (Implemented, Verification Deferred) <!-- id: 6.4 -->
+- [/] Phase 4: Payments (Code Complete, Verification Deferred) <!-- id: 7 -->
+    - [/] Backend: Razorpay Service (Mock/Test Mode) <!-- id: 7.1 -->
+    - [/] Backend: Create Order API <!-- id: 7.2 -->
+    - [/] Backend: Verify Payment API <!-- id: 7.3 -->
+    - [/] Customer App: Payment Screen (Razorpay Flutter) <!-- id: 7.4 -->
+    - [/] Backend: Commission Logic & Wallet Update <!-- id: 7.5 -->
+- [/] Phase 5: Admin & Analytics (Code Complete, Verification Deferred) <!-- id: 8 -->
+    - [/] Backend: Admin Auth & Guard <!-- id: 8.1 -->
+    - [/] Backend: Admin Dashboard Stats API <!-- id: 8.2 -->
+    - [/] Backend: Technician Verification API (Approve/Reject) <!-- id: 8.3 -->
+    - [/] Backend: Service Category Management API <!-- id: 8.4 -->
+- [/] Phase 6: Polish & Testing <!-- id: 9 -->
+    - [/] Backend: Enable Global Validation Pipe (Already Enabled) <!-- id: 9.1 -->
+    - [/] Mobile: Form Validation & Loading States Sweep <!-- id: 9.2 -->
+    - [/] Documentation: Manual Verification Steps <!-- id: 9.3 -->
+    - [/] Final Handoff <!-- id: 9.4 -->

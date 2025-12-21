@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../providers/job_provider.dart';
 import 'auth/login_screen.dart';
 import 'jobs/job_requests_screen.dart';
+import 'jobs/job_tracking_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -61,7 +62,14 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.work,
                   color: Colors.blue,
                   onTap: () {
-                    // TODO: Navigate to Active Jobs list
+                    if (jobProvider.activeJobs.isNotEmpty) {
+                       Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => JobTrackingScreen(jobId: jobProvider.activeJobs.first.id),
+                        ),
+                      );
+                    }
                   },
                 ),
                 const SizedBox(height: 16),

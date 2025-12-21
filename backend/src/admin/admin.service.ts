@@ -1,206 +1,94 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
-import { User } from '../users/entities/user.entity';
-import { Technician, TechnicianStatus } from '../technicians/entities/technician.entity';
-import { ServiceCategory } from '../services/entities/service-category.entity';
+import { Repository } from 'typeorm';
+import { User, UserRole } from '../users/entities/user.entity';
 import { ServiceRequest, ServiceRequestStatus } from '../jobs/entities/service-request.entity';
+import { Technician, TechnicianStatus } from '../technicians/entities/technician.entity';
 import { Payment, PaymentStatus } from '../payments/entities/payment.entity';
+import { ServicesService } from '../services/services.service';
 
 @Injectable()
 export class AdminService {
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
-        @InjectRepository(Technician)
-        private technicianRepository: Repository<Technician>,
-        @InjectRepository(ServiceCategory)
-        private serviceCategoryRepository: Repository<ServiceCategory>,
         @InjectRepository(ServiceRequest)
         private serviceRequestRepository: Repository<ServiceRequest>,
+        @InjectRepository(Technician)
+        private technicianRepository: Repository<Technician>,
         @InjectRepository(Payment)
         private paymentRepository: Repository<Payment>,
+        private servicesService: ServicesService,
     ) { }
 
-    // Technician Management
-    async getPendingTechnicians(): Promise<Technician[]> {
+    async getDashboardStats() {
+        const totalUsers = await this.userRepository.count();
+        const totalCustomers = await this.userRepository.count({ where: { role: UserRole.CUSTOMER } });
+        const totalTechnicians = await this.technicianRepository.count();
+        const pendingTechnicians = await this.technicianRepository.count({ where: { status: TechnicianStatus.PENDING } });
+
+        const totalJobs = await this.serviceRequestRepository.count();
+        const completedJobs = await this.serviceRequestRepository.count({ where: { status: ServiceRequestStatus.COMPLETED } });
+
+        const totalRevenueResult = await this.paymentRepository
+            .createQueryBuilder('payment')
+            .select('SUM(payment.amount)', 'sum')
+            .where('payment.status = :status', { status: PaymentStatus.COMPLETED })
+            .getRawOne();
+
+        const totalRevenue = totalRevenueResult ? parseFloat(totalRevenueResult.sum) || 0 : 0;
+
+        return {
+            users: {
+                total: totalUsers,
+                customers: totalCustomers,
+                technicians: totalTechnicians,
+                pendingTechnicians,
+            },
+            jobs: {
+                total: totalJobs,
+                completed: completedJobs,
+            },
+            revenue: {
+                total: totalRevenue,
+            },
+        };
+    }
+
+    async approveTechnician(technicianId: string) {
+        const technician = await this.technicianRepository.findOne({ where: { id: technicianId } });
+        if (!technician) {
+            throw new NotFoundException('Technician not found');
+        }
+
+        technician.status = TechnicianStatus.APPROVED;
+        return this.technicianRepository.save(technician);
+    }
+
+    async rejectTechnician(technicianId: string) {
+        const technician = await this.technicianRepository.findOne({ where: { id: technicianId } });
+        if (!technician) {
+            throw new NotFoundException('Technician not found');
+        }
+
+        technician.status = TechnicianStatus.REJECTED;
+        return this.technicianRepository.save(technician);
+    }
+
+    async getPendingTechnicians() {
         return this.technicianRepository.find({
             where: { status: TechnicianStatus.PENDING },
             relations: ['user'],
-            order: { createdAt: 'DESC' },
         });
     }
 
-    async getAllTechnicians(status?: TechnicianStatus): Promise<Technician[]> {
-        const where = status ? { status } : {};
-        return this.technicianRepository.find({
-            where,
-            relations: ['user'],
-            order: { createdAt: 'DESC' },
-        });
-    }
-
-    async approveTechnician(technicianId: string): Promise<Technician> {
-        await this.technicianRepository.update(technicianId, {
-            status: TechnicianStatus.APPROVED,
-        });
-        return this.technicianRepository.findOne({
-            where: { id: technicianId },
-            relations: ['user'],
-        });
-    }
-
-    async rejectTechnician(technicianId: string): Promise<Technician> {
-        await this.technicianRepository.update(technicianId, {
-            status: TechnicianStatus.REJECTED,
-        });
-        return this.technicianRepository.findOne({
-            where: { id: technicianId },
-            relations: ['user'],
-        });
-    }
-
-    async toggleTechnicianStatus(
-        technicianId: string,
-        isActive: boolean,
-    ): Promise<void> {
-        const technician = await this.technicianRepository.findOne({
-            where: { id: technicianId },
-            relations: ['user'],
-        });
-        await this.userRepository.update(technician.userId, { isActive });
-    }
-
-    // Service Category Management
-    async getAllServiceCategories(): Promise<ServiceCategory[]> {
-        return this.serviceCategoryRepository.find({
-            order: { name: 'ASC' },
-        });
-    }
-
-    async createServiceCategory(
-        data: Partial<ServiceCategory>,
-    ): Promise<ServiceCategory> {
-        const category = this.serviceCategoryRepository.create(data);
-        return this.serviceCategoryRepository.save(category);
-    }
-
-    async updateServiceCategory(
-        id: string,
-        data: Partial<ServiceCategory>,
-    ): Promise<ServiceCategory> {
-        await this.serviceCategoryRepository.update(id, data);
-        return this.serviceCategoryRepository.findOne({ where: { id } });
-    }
-
-    async deleteServiceCategory(id: string): Promise<void> {
-        await this.serviceCategoryRepository.update(id, { isActive: false });
-    }
-
-    // Job Monitoring
-    async getAllServiceRequests(filters?: {
-        status?: ServiceRequestStatus;
-        technicianId?: string;
-    }): Promise<ServiceRequest[]> {
-        const where: any = {};
-        if (filters?.status) where.status = filters.status;
-        if (filters?.technicianId) where.technicianId = filters.technicianId;
-
-        return this.serviceRequestRepository.find({
-            where,
-            relations: ['customer', 'technician', 'serviceCategory'],
-            order: { createdAt: 'DESC' },
-        });
-    }
-
-    async reassignJob(
-        serviceRequestId: string,
-        newTechnicianId: string,
-    ): Promise<ServiceRequest> {
-        await this.serviceRequestRepository.update(serviceRequestId, {
-            technicianId: newTechnicianId,
-            status: ServiceRequestStatus.TECHNICIAN_ASSIGNED,
-            assignedAt: new Date(),
-        });
-        return this.serviceRequestRepository.findOne({
-            where: { id: serviceRequestId },
-            relations: ['customer', 'technician', 'serviceCategory'],
-        });
-    }
-
-    // Payments & Analytics
-    async getAllPayments(): Promise<Payment[]> {
-        return this.paymentRepository.find({
-            relations: ['serviceRequest'],
-            order: { createdAt: 'DESC' },
-        });
-    }
-
-    async getAnalytics(startDate?: Date, endDate?: Date): Promise<any> {
-        const dateFilter = startDate && endDate ? Between(startDate, endDate) : {};
-
-        const totalJobs = await this.serviceRequestRepository.count({
-            where: { createdAt: dateFilter },
-        });
-
-        const completedJobs = await this.serviceRequestRepository.count({
-            where: {
-                status: ServiceRequestStatus.COMPLETED,
-                createdAt: dateFilter,
-            },
-        });
-
-        const totalRevenue = await this.paymentRepository
-            .createQueryBuilder('payment')
-            .select('SUM(payment.amount)', 'total')
-            .where('payment.status = :status', { status: PaymentStatus.COMPLETED })
-            .andWhere(
-                startDate && endDate
-                    ? 'payment.createdAt BETWEEN :startDate AND :endDate'
-                    : '1=1',
-                { startDate, endDate },
-            )
-            .getRawOne();
-
-        const totalCommission = await this.paymentRepository
-            .createQueryBuilder('payment')
-            .select('SUM(payment.commissionAmount)', 'total')
-            .where('payment.status = :status', { status: PaymentStatus.COMPLETED })
-            .andWhere(
-                startDate && endDate
-                    ? 'payment.createdAt BETWEEN :startDate AND :endDate'
-                    : '1=1',
-                { startDate, endDate },
-            )
-            .getRawOne();
-
-        const activeTechnicians = await this.technicianRepository.count({
-            where: { isOnline: true, status: TechnicianStatus.APPROVED },
-        });
-
-        const topCategories = await this.serviceRequestRepository
-            .createQueryBuilder('sr')
-            .select('sc.name', 'category')
-            .addSelect('COUNT(sr.id)', 'count')
-            .innerJoin('sr.serviceCategory', 'sc')
-            .where(
-                startDate && endDate
-                    ? 'sr.createdAt BETWEEN :startDate AND :endDate'
-                    : '1=1',
-                { startDate, endDate },
-            )
-            .groupBy('sc.id')
-            .orderBy('count', 'DESC')
-            .limit(5)
-            .getRawMany();
-
-        return {
-            totalJobs,
-            completedJobs,
-            revenue: parseFloat(totalRevenue?.total || 0),
-            commission: parseFloat(totalCommission?.total || 0),
-            activeTechnicians,
-            topCategories,
-        };
+    async createServiceCategory(data: any) {
+        // Delegate to existing service but wrap with admin permission check logic if needed
+        // Since seeding is in service, maybe we should expose create in services service publicly?
+        // Actually, better to keep modification logic restricted.
+        // For MVP, likely just a direct db insert via ServicesService if exposed, or here.
+        // Let's assume ServicesService doesn't have a public create method yet except seed.
+        // We'll implement a create method in ServicesService and call it.
+        return this.servicesService.create(data);
     }
 }

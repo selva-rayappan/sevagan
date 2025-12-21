@@ -4,6 +4,7 @@ import 'package:technician_app/l10n/app_localizations.dart';
 import '../../providers/job_provider.dart';
 import '../../data/models/job_model.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'job_tracking_screen.dart';
 
 class JobDetailScreen extends StatelessWidget {
   final String jobId;
@@ -70,11 +71,17 @@ class JobDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
-                        jobProvider.acceptJob(job.id);
-                        Navigator.pop(context);
+                      onPressed: () async {
+                        await jobProvider.acceptJob(job.id);
+                        if (context.mounted) {
+                           Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => JobTrackingScreen(jobId: job.id),
+                            ),
+                          );
+                        }
                       },
                       child: Text(l10n.accept),
                     ),
@@ -94,7 +101,14 @@ class JobDetailScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => jobProvider.startJob(job.id),
+                  onPressed: () {
+                     Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => JobTrackingScreen(jobId: job.id),
+                        ),
+                      );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
                   ),
@@ -105,7 +119,14 @@ class JobDetailScreen extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => jobProvider.completeJob(job.id),
+                  onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => JobTrackingScreen(jobId: job.id),
+                        ),
+                      );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                   ),

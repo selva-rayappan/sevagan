@@ -1,7 +1,7 @@
 class ApiConfig {
   static const String baseUrl = String.fromEnvironment(
     'API_URL',
-    defaultValue: 'http://localhost:3000/api',
+    defaultValue: 'http://10.0.2.2:3000/api',
   );
   
   // Auth endpoints
@@ -19,4 +19,9 @@ class ApiConfig {
   // Payment endpoints
   static const String createPayment = '/payments/create';
   static const String verifyPayment = '/payments/verify';
+  
+  static const String razorpayKeyId = String.fromEnvironment(
+    'RAZORPAY_KEY_ID',
+    defaultValue: 'rzp_test_PLACEHOLDER', // TODO: User to replace
+  );
 }

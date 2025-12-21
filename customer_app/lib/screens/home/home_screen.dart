@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/location_provider.dart';
 import '../../models/service_category.dart';
 import '../../services/api_service.dart';
+import '../jobs/create_job_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -151,7 +152,12 @@ class _HomeScreenState extends State<HomeScreen> {
       elevation: 2,
       child: InkWell(
         onTap: () {
-          // TODO: Navigate to service request screen
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+               builder: (context) => CreateJobScreen(category: category),
+            ),
+          );
         },
         child: Padding(
           padding: const EdgeInsets.all(16),

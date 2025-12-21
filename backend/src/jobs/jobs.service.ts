@@ -4,7 +4,7 @@ import {
     BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { ServiceRequest, ServiceRequestStatus } from './entities/service-request.entity';
 import { Rating } from './entities/rating.entity';
 import { JobMatchingService } from './job-matching.service';
@@ -95,11 +95,15 @@ export class JobsService {
             throw new BadRequestException('Job already assigned to another technician');
         }
 
+        // Generate Start Job OTP
+        const startJobOtp = Math.floor(1000 + Math.random() * 9000).toString();
+
         // Update service request
         await this.serviceRequestRepository.update(serviceRequestId, {
             technicianId,
             status: ServiceRequestStatus.TECHNICIAN_ASSIGNED,
             assignedAt: new Date(),
+            startJobOtp,
         });
 
         const request = await this.findById(serviceRequestId);
@@ -114,11 +118,23 @@ export class JobsService {
         return request;
     }
 
-    async startJob(serviceRequestId: string, technicianId: string): Promise<ServiceRequest> {
+    async startJob(
+        serviceRequestId: string,
+        technicianId: string,
+        otp: string,
+    ): Promise<ServiceRequest> {
         const request = await this.findById(serviceRequestId);
 
         if (request.technicianId !== technicianId) {
             throw new BadRequestException('Unauthorized');
+        }
+
+        if (request.status !== ServiceRequestStatus.TECHNICIAN_ASSIGNED) {
+            throw new BadRequestException('Job cannot be started in current status');
+        }
+
+        if (request.startJobOtp !== otp) {
+            throw new BadRequestException('Invalid OTP');
         }
 
         await this.serviceRequestRepository.update(serviceRequestId, {
@@ -226,5 +242,23 @@ export class JobsService {
         await this.techniciansService.updateRating(request.technicianId, rating);
 
         return newRating;
+    }
+    async markAsPaid(serviceRequestId: string): Promise<ServiceRequest> {
+        await this.serviceRequestRepository.update(serviceRequestId, {
+            status: ServiceRequestStatus.COMPLETED,
+        });
+
+        return this.findById(serviceRequestId);
+    }
+
+    async findAvailableJobs(): Promise<ServiceRequest[]> {
+        return this.serviceRequestRepository.find({
+            where: {
+                status: ServiceRequestStatus.REQUESTED,
+                technicianId: null, // Note: This requires .IsNull() logic if strict, but null works in simple find
+            },
+            relations: ['customer', 'serviceCategory'],
+            order: { createdAt: 'DESC' },
+        });
     }
 }

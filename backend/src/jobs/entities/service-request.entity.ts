@@ -101,6 +101,9 @@ export class ServiceRequest {
     @Column({ nullable: true })
     cancellationReason: string;
 
+    @Column({ nullable: true })
+    startJobOtp: string;
+
     @CreateDateColumn()
     createdAt: Date;
 

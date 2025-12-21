@@ -60,10 +60,10 @@ class _OtpScreenState extends State<OtpScreen> {
               keyboardType: TextInputType.number,
               textAlign: TextAlign.center,
               decoration: const InputDecoration(
-                hintText: 'Enter 4 digit OTP',
+                hintText: 'Enter 6 digit OTP',
                 counterText: '',
               ),
-              maxLength: 4,
+              maxLength: 6,
             ),
             const SizedBox(height: 24),
             SizedBox(

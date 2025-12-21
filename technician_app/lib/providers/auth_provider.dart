@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dio/dio.dart';
+import '../core/constants.dart';
 
 class AuthProvider with ChangeNotifier {
   bool _isAuthenticated = false;
@@ -19,25 +21,52 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  final Dio _dio = Dio(BaseOptions(
+    baseUrl: ApiConstants.baseUrl,
+    connectTimeout: const Duration(seconds: 5),
+    receiveTimeout: const Duration(seconds: 3),
+  ));
+
   Future<void> login(String mobile) async {
-    // Simulate API login
-    await Future.delayed(const Duration(seconds: 1));
-    _phoneNumber = mobile;
-    notifyListeners();
+    try {
+      await _dio.post(
+        ApiConstants.authOtp,
+        data: {'phone': mobile},
+      );
+      _phoneNumber = mobile;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Login Error: $e');
+      rethrow;
+    }
   }
 
   Future<bool> verifyOtp(String otp) async {
-    // Simulate OTP verification
-    await Future.delayed(const Duration(seconds: 1));
-    if (otp == '1234') {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isAuthenticated', true);
-      await prefs.setString('phoneNumber', _phoneNumber!);
-      _isAuthenticated = true;
-      notifyListeners();
-      return true;
+    try {
+      final response = await _dio.post(
+        ApiConstants.authVerify,
+        data: {
+          'phone': _phoneNumber,
+          'code': otp,
+          'role': 'TECHNICIAN'
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final token = response.data['accessToken'];
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isAuthenticated', true);
+        await prefs.setString('phoneNumber', _phoneNumber!);
+        await prefs.setString('token', token);
+        _isAuthenticated = true;
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint('Verify Error: $e');
+      return false;
     }
-    return false;
   }
 
   Future<void> logout() async {

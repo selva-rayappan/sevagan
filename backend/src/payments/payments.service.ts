@@ -106,8 +106,7 @@ export class PaymentsService {
         await this.paymentRepository.save(payment);
 
         // Update service request status
-        await this.jobsService.findById(payment.serviceRequestId);
-        // Update to COMPLETED status (implement in JobsService)
+        await this.jobsService.markAsPaid(payment.serviceRequestId);
 
         // Update technician wallet
         await this.techniciansService.updateWalletBalance(
