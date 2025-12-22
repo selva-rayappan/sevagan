@@ -13,6 +13,9 @@ class AuthProvider with ChangeNotifier {
   String? get userId => _userId;
   String? get phone => _phone;
 
+  Map<String, dynamic>? get user =>
+      _userId != null ? {'id': _userId, 'phone': _phone, 'email': null} : null;
+
   final ApiService _apiService = ApiService();
 
   AuthProvider() {

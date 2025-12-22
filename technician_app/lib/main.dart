@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:technician_app/l10n/app_localizations.dart';
 import 'core/theme.dart';
@@ -8,10 +8,11 @@ import 'providers/auth_provider.dart';
 import 'providers/job_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/profile_check_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  // await Firebase.initializeApp();
   runApp(const TechnicianApp());
 }
 
@@ -41,7 +42,7 @@ class TechnicianApp extends StatelessWidget {
             ],
             supportedLocales: const [Locale('en', ''), Locale('ta', '')],
             home: auth.isAuthenticated
-                ? const HomeScreen()
+                ? ProfileCheckScreen(key: UniqueKey())
                 : const LoginScreen(),
           );
         },

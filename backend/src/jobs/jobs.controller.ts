@@ -66,6 +66,20 @@ export class JobsController {
         return this.jobsService.findByTechnicianId(technician.id);
     }
 
+    @Get('available')
+    @Roles(UserRole.TECHNICIAN)
+    @ApiOperation({ summary: 'Get available jobs for technicians' })
+    async getAvailableJobs() {
+        return this.jobsService.findAvailableJobs();
+    }
+
+    @Get()
+    @Roles(UserRole.ADMIN)
+    @ApiOperation({ summary: 'Get all jobs (Admin only)' })
+    async getAllJobs() {
+        return this.jobsService.findAll();
+    }
+
     @Get(':id')
     @ApiOperation({ summary: 'Get service request details' })
     async getServiceRequest(@Param('id') id: string) {
@@ -123,11 +137,5 @@ export class JobsController {
         @Body() data: { rating: number; comment?: string },
     ) {
         return this.jobsService.rateJob(id, user.id, data.rating, data.comment);
-    }
-    @Get('available')
-    @Roles(UserRole.TECHNICIAN)
-    @ApiOperation({ summary: 'Get available jobs (Poling fallback)' })
-    async getAvailableJobs() {
-        return this.jobsService.findAvailableJobs();
     }
 }

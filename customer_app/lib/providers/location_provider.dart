@@ -11,6 +11,9 @@ class LocationProvider with ChangeNotifier {
   String? get currentAddress => _currentAddress;
   bool get isLoading => _isLoading;
 
+  double? get latitude => _currentPosition?.latitude;
+  double? get longitude => _currentPosition?.longitude;
+
   Future<bool> requestPermission() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {

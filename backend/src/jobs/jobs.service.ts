@@ -81,6 +81,13 @@ export class JobsService {
         });
     }
 
+    async findAll(): Promise<ServiceRequest[]> {
+        return this.serviceRequestRepository.find({
+            relations: ['customer', 'technician', 'serviceCategory'],
+            order: { createdAt: 'DESC' },
+        });
+    }
+
     async acceptJob(
         serviceRequestId: string,
         technicianId: string,

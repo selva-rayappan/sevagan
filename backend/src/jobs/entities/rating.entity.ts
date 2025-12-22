@@ -6,7 +6,7 @@ import {
     ManyToOne,
     JoinColumn,
 } from 'typeorm';
-import { ServiceRequest } from '../../jobs/entities/service-request.entity';
+import { ServiceRequest } from './service-request.entity';
 import { User } from '../../users/entities/user.entity';
 import { Technician } from '../../technicians/entities/technician.entity';
 

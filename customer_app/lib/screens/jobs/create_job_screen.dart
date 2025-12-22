@@ -17,8 +17,9 @@ class CreateJobScreen extends StatefulWidget {
 
 class _CreateJobScreenState extends State<CreateJobScreen> {
   final _descriptionController = TextEditingController();
+  final apiService = ApiService();
   bool _isLoading = false;
-  
+
   @override
   void dispose() {
     _descriptionController.dispose();
@@ -38,10 +39,11 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
     try {
       final authProvider = context.read<AuthProvider>();
       final locationProvider = context.read<LocationProvider>();
-      
+
       // Ensure we have location
-      if (locationProvider.latitude == null || locationProvider.longitude == null) {
-          await locationProvider.getCurrentLocation();
+      if (locationProvider.latitude == null ||
+          locationProvider.longitude == null) {
+        await locationProvider.getCurrentLocation();
       }
 
       final request = await apiService.createServiceRequest(
@@ -51,7 +53,8 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
           'description': _descriptionController.text,
           'locationLat': locationProvider.latitude ?? 13.0827,
           'locationLng': locationProvider.longitude ?? 80.2707,
-          'locationAddress': locationProvider.currentAddress ?? 'Unknown Location',
+          'locationAddress':
+              locationProvider.currentAddress ?? 'Unknown Location',
           'imageUrls': [],
         },
       );
@@ -109,9 +112,9 @@ class _CreateJobScreenState extends State<CreateJobScreen> {
             Text(
               'Estimated Base Price: ₹${widget.category.basePrice}',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.green,
-                fontWeight: FontWeight.bold,
-              ),
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             const Spacer(),
             ElevatedButton(

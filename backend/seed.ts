@@ -1,10 +1,9 @@
 
 import { DataSource } from 'typeorm';
-import { ServiceCategory } from '../src/services/entities/service.entity';
-import { User, UserRole } from '../src/users/entities/user.entity';
+import { ServiceCategory } from './src/services/entities/service-category.entity';
+import { User, UserRole } from './src/users/entities/user.entity';
 import * as bcrypt from 'bcrypt';
 import * as dotenv from 'dotenv';
-import { ServiceRequestStatus } from '../src/jobs/entities/service-request.entity';
 
 dotenv.config();
 
@@ -15,7 +14,7 @@ const AppDataSource = new DataSource({
     username: process.env.DATABASE_USER || 'sevagan_user',
     password: process.env.DATABASE_PASSWORD || 'sevagan_password',
     database: process.env.DATABASE_NAME || 'sevagan',
-    entities: [__dirname + '/../src/**/*.entity.ts'],
+    entities: [ServiceCategory, User],
     synchronize: false,
 });
 
@@ -29,55 +28,73 @@ async function seed() {
     // 1. Seed Service Categories
     const categories = [
         {
-            name: 'Electrician',
-            icon: 'electric_bolt',
+            name: 'electrician', // Internal unique name
+            nameEn: 'Electrician',
+            nameTa: 'மின்வேலை',
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/2932/2932943.png',
             basePrice: 150,
-            priceRange: '₹150 - ₹1000',
+            minPrice: 150,
+            maxPrice: 1000,
             commissionPercent: 15,
             description: 'Wiring, switch repair, fan installation, and more',
             isActive: true
         },
         {
-            name: 'Plumber',
-            icon: 'plumbing',
+            name: 'plumber',
+            nameEn: 'Plumber',
+            nameTa: 'குழாய் வேலை',
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/307/307883.png',
             basePrice: 150,
-            priceRange: '₹150 - ₹1500',
+            minPrice: 150,
+            maxPrice: 1500,
             commissionPercent: 15,
             description: 'Leak repair, pipe fitting, tap replacement',
             isActive: true
         },
         {
-            name: 'AC Service',
-            icon: 'ac_unit',
+            name: 'ac_service',
+            nameEn: 'AC Service',
+            nameTa: 'ஏசி சர்வீஸ்',
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/911/911409.png',
             basePrice: 400,
-            priceRange: '₹400 - ₹2500',
+            minPrice: 400,
+            maxPrice: 2500,
             commissionPercent: 20,
             description: 'AC cleaning, gas filling, installation',
             isActive: true
         },
         {
-            name: 'Washing Machine',
-            icon: 'local_laundry_service',
+            name: 'washing_machine',
+            nameEn: 'Washing Machine',
+            nameTa: 'வாஷிங் மெஷின்',
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/3565/3565293.png',
             basePrice: 300,
-            priceRange: '₹300 - ₹3000',
+            minPrice: 300,
+            maxPrice: 3000,
             commissionPercent: 15,
             description: 'Drum cleaning, motor repair, pc board issues',
             isActive: true
         },
         {
-            name: 'Bike Repair',
-            icon: 'two_wheeler',
+            name: 'bike_repair',
+            nameEn: 'Bike Repair',
+            nameTa: 'பைக் சர்வீஸ்',
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/2932/2932943.png', // Placeholder icon
             basePrice: 200,
-            priceRange: '₹200 - ₹5000',
+            minPrice: 200,
+            maxPrice: 5000,
             commissionPercent: 10,
             description: 'General service, puncture, oil change',
             isActive: true
         },
         {
-            name: 'Motor Repair',
-            icon: 'settings',
+            name: 'motor_repair',
+            nameEn: 'Motor Repair',
+            nameTa: 'மோட்டார் சர்வீஸ்',
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/3565/3565293.png', // Placeholder icon
             basePrice: 350,
-            priceRange: '₹350 - ₹2000',
+            minPrice: 350,
+            maxPrice: 2000,
             commissionPercent: 15,
             description: 'Water pump repair, coil winding',
             isActive: true
@@ -88,9 +105,9 @@ async function seed() {
         const existing = await categoryRepo.findOne({ where: { name: cat.name } });
         if (!existing) {
             await categoryRepo.save(categoryRepo.create(cat));
-            console.log(`Created service category: ${cat.name}`);
+            console.log(`Created service category: ${cat.nameEn}`);
         } else {
-            console.log(`Service category exists: ${cat.name}`);
+            console.log(`Service category exists: ${cat.nameEn}`);
         }
     }
 
@@ -100,14 +117,18 @@ async function seed() {
     const adminExists = await userRepo.findOne({ where: { email: adminEmail } });
 
     if (!adminExists) {
-        const password = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'Admin@123', 10);
+        // Note: Password field missing in User entity. Skipping password setting.
+        // const password = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'Admin@123', 10);
         const admin = userRepo.create({
             email: adminEmail,
             phone: adminPhone,
-            password: password,
+            // password: password, 
             role: UserRole.ADMIN,
-            isPhoneVerified: true
+            // isPhoneVerified: true // Field missing in entity? Check.
         });
+        // Check if isPhoneVerified exists in entity, user.ts showed: phone, role, name, email, isActive, fcmToken, createdAt, updatedAt.
+        // It does NOT show isPhoneVerified.
+
         await userRepo.save(admin);
         console.log(`Created admin user: ${adminEmail}`);
     } else {

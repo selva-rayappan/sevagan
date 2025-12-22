@@ -26,7 +26,8 @@ class _JobStatusScreenState extends State<JobStatusScreen> {
     super.initState();
     _loadJobDetails();
     // Poll for status updates every 10 seconds
-    _pollingTimer = Timer.periodic(const Duration(seconds: 10), (_) => _loadJobDetails());
+    _pollingTimer =
+        Timer.periodic(const Duration(seconds: 10), (_) => _loadJobDetails());
   }
 
   @override
@@ -39,8 +40,9 @@ class _JobStatusScreenState extends State<JobStatusScreen> {
     try {
       final authProvider = context.read<AuthProvider>();
       final apiService = ApiService();
-      final job = await apiService.getJobDetails(authProvider.token!, widget.jobId);
-      
+      final job =
+          await apiService.getJobDetails(authProvider.token!, widget.jobId);
+
       if (mounted) {
         setState(() {
           _job = job;
@@ -53,8 +55,8 @@ class _JobStatusScreenState extends State<JobStatusScreen> {
   }
 
   void _callTechnician() {
-    if (_job?.technician?.user?.phone != null) {
-      launchUrl(Uri.parse('tel:${_job!.technician!.user!.phone}'));
+    if (_job?.technician?['user']?['phone'] != null) {
+      launchUrl(Uri.parse('tel:${_job!.technician!['user']['phone']}'));
     }
   }
 
@@ -74,7 +76,7 @@ class _JobStatusScreenState extends State<JobStatusScreen> {
                       _buildStatusCard(),
                       const SizedBox(height: 24),
                       if (_job!.status == 'TECHNICIAN_ASSIGNED')
-                         _buildOtpCard(),
+                        _buildOtpCard(),
                       const SizedBox(height: 24),
                       _buildTechnicianCard(),
                       const SizedBox(height: 24),
@@ -143,22 +145,24 @@ class _JobStatusScreenState extends State<JobStatusScreen> {
                 color: statusColor,
               ),
             ),
-             if (_job!.status == 'JOB_COMPLETED') ...[
+            if (_job!.status == 'JOB_COMPLETED') ...[
               const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () async {
-                   final result = await Navigator.push(
-                     context,
-                     MaterialPageRoute(builder: (_) => PaymentScreen(job: _job!)),
-                   );
-                   if (result == true) {
-                     _loadJobDetails(); // Refresh to see updated status
-                   }
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => PaymentScreen(job: _job!)),
+                  );
+                  if (result == true) {
+                    _loadJobDetails(); // Refresh to see updated status
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.teal,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 ),
                 child: const Text('PAY NOW'),
               ),
@@ -202,8 +206,9 @@ class _JobStatusScreenState extends State<JobStatusScreen> {
     return Card(
       child: ListTile(
         leading: const CircleAvatar(child: Icon(Icons.person)),
-        title: Text(_job!.technician!.user?.name ?? 'Unknown Technician'),
-        subtitle: Text('Rating: ${_job!.technician!.rating.toStringAsFixed(1)} ★'),
+        title: Text(_job!.technician!['user']?['name'] ?? 'Unknown Technician'),
+        subtitle: Text(
+            'Rating: ${(_job!.technician!['rating'] ?? 0.0).toStringAsFixed(1)} ★'),
         trailing: IconButton(
           icon: const Icon(Icons.phone, color: Colors.green),
           onPressed: _callTechnician,
@@ -221,11 +226,13 @@ class _JobStatusScreenState extends State<JobStatusScreen> {
           children: [
             Text('Job Details', style: Theme.of(context).textTheme.titleLarge),
             const Divider(),
-            _buildDetailRow('Category', _job!.serviceCategory.nameEn),
+            _buildDetailRow(
+                'Category', _job!.serviceCategory?['nameEn'] ?? 'Unknown'),
             _buildDetailRow('Description', _job!.description),
             _buildDetailRow('Estimated Price', '₹${_job!.estimatedPrice}'),
             if (_job!.finalPrice != null)
-              _buildDetailRow('Final Price', '₹${_job!.finalPrice}', isBold: true),
+              _buildDetailRow('Final Price', '₹${_job!.finalPrice}',
+                  isBold: true),
           ],
         ),
       ),

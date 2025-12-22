@@ -66,7 +66,7 @@ export const deleteService = async (id) => {
 
 // Jobs
 export const getJobs = async (filters) => {
-    const response = await api.get('/admin/jobs', { params: filters })
+    const response = await api.get('/jobs', { params: filters })
     return response.data
 }
 

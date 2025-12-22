@@ -29,11 +29,11 @@ export default function Dashboard() {
         { name: 'Total Jobs', value: analytics?.totalJobs || 0, color: 'bg-blue-500' },
         { name: 'Completed Jobs', value: analytics?.completedJobs || 0, color: 'bg-green-500' },
         { name: 'Active Technicians', value: analytics?.activeTechnicians || 0, color: 'bg-purple-500' },
-        { name: 'Revenue', value: `₹${analytics?.revenue?.toFixed(0) || 0}`, color: 'bg-yellow-500' },
+        { name: 'Revenue', value: `â‚¹${analytics?.revenue?.toFixed(0) || 0}`, color: 'bg-yellow-500' },
     ]
 
     return (
-        <div>
+        <div className="w-full max-w-7xl">
             <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
 
             {/* Stats Grid */}

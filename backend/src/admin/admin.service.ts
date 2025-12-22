@@ -75,11 +75,52 @@ export class AdminService {
         return this.technicianRepository.save(technician);
     }
 
+    async getAllTechnicians(status?: string) {
+        const where = status ? { status: status as TechnicianStatus } : {};
+        return this.technicianRepository.find({
+            where,
+            relations: ['user'],
+            order: { createdAt: 'DESC' },
+        });
+    }
+
     async getPendingTechnicians() {
         return this.technicianRepository.find({
             where: { status: TechnicianStatus.PENDING },
             relations: ['user'],
         });
+    }
+
+    async getAnalytics() {
+        // Reuse dashboard stats as base analytics
+        const stats = await this.getDashboardStats();
+
+        // Add more analytics data
+        const activeJobs = await this.serviceRequestRepository.count({
+            where: { status: ServiceRequestStatus.JOB_STARTED }
+        });
+
+        const onlineTechnicians = await this.technicianRepository.count({
+            where: { isOnline: true, status: TechnicianStatus.APPROVED }
+        });
+
+        return {
+            users: stats.users,
+            jobs: {
+                ...stats.jobs,
+                active: activeJobs,
+            },
+            technicians: {
+                total: stats.users.technicians,
+                online: onlineTechnicians,
+                pending: stats.users.pendingTechnicians,
+            },
+            revenue: stats.revenue.total,
+        };
+    }
+
+    async getServiceCategories() {
+        return this.servicesService.findAll();
     }
 
     async createServiceCategory(data: any) {

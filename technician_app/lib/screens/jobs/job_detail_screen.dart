@@ -50,7 +50,7 @@ class JobDetailScreen extends StatelessWidget {
             Text(job.description),
             const SizedBox(height: 16),
             Text(
-              'Price: ₹${job.price}',
+              'Price: â‚¹${job.price}',
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(color: Colors.green),
@@ -71,6 +71,7 @@ class JobDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 16),
+                  Expanded(
                     child: ElevatedButton(
                       onPressed: () async {
                         await jobProvider.acceptJob(job.id);
@@ -140,3 +141,4 @@ class JobDetailScreen extends StatelessWidget {
     );
   }
 }
+

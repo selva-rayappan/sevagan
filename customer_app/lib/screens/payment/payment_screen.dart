@@ -57,11 +57,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
         'key': ApiConfig.razorpayKeyId,
         'amount': amount,
         'name': 'Sevagan Services',
-        'description': 'Payment for ${widget.job.serviceCategory.nameEn}',
+        'description':
+            'Payment for ${widget.job.serviceCategory?['nameEn'] ?? 'Service'}',
         'order_id': orderId,
         'prefill': {
-          'contact': authProvider.user?.phone ?? '', 
-          'email': authProvider.user?.email ?? 'customer@example.com'
+          'contact': authProvider.user?['phone'] ?? '',
+          'email': authProvider.user?['email'] ?? 'customer@example.com'
         },
         'external': {
           'wallets': ['paytm']
@@ -69,7 +70,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       };
 
       _razorpay.open(options);
-
     } catch (e) {
       print('Error initiating payment: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -134,14 +134,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    const Text('Total Amount to Pay', style: TextStyle(color: Colors.grey)),
+                    const Text('Total Amount to Pay',
+                        style: TextStyle(color: Colors.grey)),
                     const SizedBox(height: 8),
                     Text(
                       '₹$amount',
-                      style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontSize: 32, fontWeight: FontWeight.bold),
                     ),
                     const Divider(height: 32),
-                     Text('Service: ${widget.job.serviceCategory.nameEn}'),
+                    Text(
+                        'Service: ${widget.job.serviceCategory?['nameEn'] ?? 'Unknown'}'),
                   ],
                 ),
               ),

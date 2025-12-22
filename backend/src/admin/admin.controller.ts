@@ -20,6 +20,12 @@ export class AdminController {
         return this.adminService.getDashboardStats();
     }
 
+    @Get('technicians')
+    @ApiOperation({ summary: 'Get all technicians (with optional status filter)' })
+    async getAllTechnicians(@Param('status') status?: string) {
+        return this.adminService.getAllTechnicians(status);
+    }
+
     @Get('technicians/pending')
     @ApiOperation({ summary: 'Get pending technician approvals' })
     async getPendingTechnicians() {
@@ -36,6 +42,18 @@ export class AdminController {
     @ApiOperation({ summary: 'Reject a technician' })
     async rejectTechnician(@Param('id') id: string) {
         return this.adminService.rejectTechnician(id);
+    }
+
+    @Get('services')
+    @ApiOperation({ summary: 'Get all service categories' })
+    async getServices() {
+        return this.adminService.getServiceCategories();
+    }
+
+    @Get('analytics')
+    @ApiOperation({ summary: 'Get platform analytics' })
+    async getAnalytics() {
+        return this.adminService.getAnalytics();
     }
 
     @Post('categories')

@@ -14,6 +14,9 @@ class ServiceRequest {
   final String? locationAddress;
   final DateTime createdAt;
   final DateTime? completedAt;
+  final String? startJobOtp;
+  final Map<String, dynamic>? technician;
+  final Map<String, dynamic>? serviceCategory;
 
   ServiceRequest({
     required this.id,
@@ -31,6 +34,9 @@ class ServiceRequest {
     this.locationAddress,
     required this.createdAt,
     this.completedAt,
+    this.startJobOtp,
+    this.technician,
+    this.serviceCategory,
   });
 
   factory ServiceRequest.fromJson(Map<String, dynamic> json) {
@@ -52,6 +58,9 @@ class ServiceRequest {
       completedAt: json['completedAt'] != null
           ? DateTime.parse(json['completedAt'])
           : null,
+      startJobOtp: json['startJobOtp'],
+      technician: json['technician'],
+      serviceCategory: json['serviceCategory'],
     );
   }
 }

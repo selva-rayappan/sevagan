@@ -40,4 +40,13 @@ export class AuthController {
         await this.authService.updateFcmToken(user.id, dto.fcmToken);
         return { message: 'FCM token updated successfully' };
     }
+
+    @Post('admin/login')
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Admin login with email and password' })
+    @ApiResponse({ status: 200, description: 'Login successful' })
+    @ApiResponse({ status: 401, description: 'Invalid credentials' })
+    async adminLogin(@Body() dto: { email: string; password: string }) {
+        return this.authService.adminLogin(dto.email, dto.password);
+    }
 }

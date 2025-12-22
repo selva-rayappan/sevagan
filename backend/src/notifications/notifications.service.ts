@@ -12,16 +12,24 @@ export class NotificationsService {
             .get('FIREBASE_PRIVATE_KEY', '')
             .replace(/\\n/g, '\n');
 
-        if (privateKey && this.configService.get('FIREBASE_PROJECT_ID')) {
-            this.firebaseApp = admin.initializeApp({
-                credential: admin.credential.cert({
-                    projectId: this.configService.get('FIREBASE_PROJECT_ID'),
-                    privateKey,
-                    clientEmail: this.configService.get('FIREBASE_CLIENT_EMAIL'),
-                }),
-            });
+        if (
+            privateKey &&
+            privateKey !== 'placeholder' &&
+            this.configService.get('FIREBASE_PROJECT_ID') !== 'placeholder'
+        ) {
+            try {
+                this.firebaseApp = admin.initializeApp({
+                    credential: admin.credential.cert({
+                        projectId: this.configService.get('FIREBASE_PROJECT_ID'),
+                        privateKey,
+                        clientEmail: this.configService.get('FIREBASE_CLIENT_EMAIL'),
+                    }),
+                });
+            } catch (error) {
+                console.warn('Firebase initialization failed. Push notifications disabled.', error.message);
+            }
         } else {
-            console.warn('Firebase credentials not configured. Push notifications disabled.');
+            console.warn('Firebase credentials not configured or are placeholders. Push notifications disabled.');
         }
     }
 

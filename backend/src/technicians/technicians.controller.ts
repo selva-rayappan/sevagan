@@ -7,6 +7,7 @@ import {
     UseGuards,
     UseInterceptors,
     UploadedFile,
+    NotFoundException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
@@ -32,7 +33,11 @@ export class TechniciansController {
     @Roles(UserRole.TECHNICIAN)
     @ApiOperation({ summary: 'Get technician profile' })
     async getProfile(@GetUser() user: User) {
-        return this.techniciansService.findByUserId(user.id);
+        const profile = await this.techniciansService.findByUserId(user.id);
+        if (!profile) {
+            throw new NotFoundException('Technician profile not found');
+        }
+        return profile;
     }
 
     @Post('profile')

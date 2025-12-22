@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../core/constants.dart';
@@ -38,7 +37,7 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('auth_token');
-      
+
       final response = await Dio().get(
         '${ApiConstants.baseUrl}/jobs/${widget.jobId}',
         options: Options(headers: {'Authorization': 'Bearer $token'}),
@@ -70,10 +69,14 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
 
   JobStatus _parseStatus(String status) {
     switch (status) {
-      case 'TECHNICIAN_ASSIGNED': return JobStatus.accepted;
-      case 'JOB_STARTED': return JobStatus.started;
-      case 'JOB_COMPLETED': return JobStatus.completed;
-      default: return JobStatus.pending;
+      case 'TECHNICIAN_ASSIGNED':
+        return JobStatus.accepted;
+      case 'JOB_STARTED':
+        return JobStatus.started;
+      case 'JOB_COMPLETED':
+        return JobStatus.completed;
+      default:
+        return JobStatus.pending;
     }
   }
 
@@ -90,27 +93,27 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
       final token = prefs.getString('auth_token');
 
       await Dio().post(
-         '${ApiConstants.baseUrl}/jobs/${widget.jobId}/start',
-         data: {'otp': _otpController.text},
-         options: Options(headers: {'Authorization': 'Bearer $token'}),
+        '${ApiConstants.baseUrl}/jobs/${widget.jobId}/start',
+        data: {'otp': _otpController.text},
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Job Started!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Job Started!')));
       _loadJobDetails(); // Refresh status
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error starting job: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error starting job: $e')));
     }
   }
 
   Future<void> _completeJob() async {
-     if (_priceController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter final price')),
-      );
+    if (_priceController.text.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please enter final price')));
       return;
     }
 
@@ -119,25 +122,25 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
       final token = prefs.getString('auth_token');
 
       await Dio().post(
-         '${ApiConstants.baseUrl}/jobs/${widget.jobId}/complete',
-         data: {'finalPrice': double.parse(_priceController.text)},
-         options: Options(headers: {'Authorization': 'Bearer $token'}),
+        '${ApiConstants.baseUrl}/jobs/${widget.jobId}/complete',
+        data: {'finalPrice': double.parse(_priceController.text)},
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Job Completed!')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Job Completed!')));
       Navigator.pop(context); // Return to home list
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error completing job: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error completing job: $e')));
     }
   }
 
   void _callCustomer() {
     // In real app, fetch customer phone
-    launchUrl(Uri.parse('tel:9876543210')); 
+    launchUrl(Uri.parse('tel:9876543210'));
   }
 
   @override
@@ -147,34 +150,37 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _job == null
-              ? const Center(child: Text('Job Error'))
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildCustomerCard(),
-                      const SizedBox(height: 24),
-                      if (_job!.status == JobStatus.accepted)
-                         _buildStartJobCard()
-                      else if (_job!.status == JobStatus.started)
-                         _buildCompleteJobCard(),
-                      
-                      if (_job!.status == JobStatus.completed)
-                        const Card(
-                          color: Colors.green,
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
-                            child:  Text(
-                              'Job Completed Successfully', 
-                              textAlign: TextAlign.center,
-                               style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                            ),
+          ? const Center(child: Text('Job Error'))
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildCustomerCard(),
+                  const SizedBox(height: 24),
+                  if (_job!.status == JobStatus.accepted)
+                    _buildStartJobCard()
+                  else if (_job!.status == JobStatus.started)
+                    _buildCompleteJobCard(),
+
+                  if (_job!.status == JobStatus.completed)
+                    const Card(
+                      color: Colors.green,
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Text(
+                          'Job Completed Successfully',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                    ],
-                  ),
-                ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -190,7 +196,10 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
               children: [
                 Text(
                   _job!.customerName,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.phone, color: Colors.green),
@@ -251,14 +260,18 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-             const Text(
+            const Text(
               'Job in Progress',
-              style: TextStyle(fontSize: 18, color: Colors.blue, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.blue,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 24),
             const Text('Enter Final Amount'),
             const SizedBox(height: 8),
-             TextField(
+            TextField(
               controller: _priceController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
@@ -266,7 +279,7 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
-             const SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
               onPressed: _completeJob,
               style: ElevatedButton.styleFrom(

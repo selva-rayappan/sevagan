@@ -74,4 +74,44 @@ export class AuthService {
     async updateFcmToken(userId: string, fcmToken: string): Promise<void> {
         await this.userRepository.update(userId, { fcmToken });
     }
+
+    async adminLogin(
+        email: string,
+        password: string,
+    ): Promise<{ accessToken: string; user: User }> {
+        // Validate against environment variables
+        const adminEmail = process.env.ADMIN_EMAIL || 'admin@sevagan.com';
+        const adminPassword = process.env.ADMIN_PASSWORD || 'Admin@123';
+
+        if (email !== adminEmail || password !== adminPassword) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+
+        // Find or create admin user
+        let user = await this.userRepository.findOne({
+            where: { email: adminEmail }
+        });
+
+        if (!user) {
+            // Create admin user if doesn't exist
+            user = this.userRepository.create({
+                email: adminEmail,
+                phone: '9999999999', // Admin phone from seed
+                role: UserRole.ADMIN,
+                name: 'Admin',
+            });
+            await this.userRepository.save(user);
+        }
+
+        // Generate JWT token
+        const payload: JwtPayload = {
+            sub: user.id,
+            phone: user.phone,
+            role: user.role,
+        };
+
+        const accessToken = this.jwtService.sign(payload);
+
+        return { accessToken, user };
+    }
 }

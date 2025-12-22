@@ -7,8 +7,22 @@ import 'auth/login_screen.dart';
 import 'jobs/job_requests_screen.dart';
 import 'jobs/job_tracking_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch available jobs when home screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<JobProvider>().fetchAvailableJobs();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,10 +77,12 @@ class HomeScreen extends StatelessWidget {
                   color: Colors.blue,
                   onTap: () {
                     if (jobProvider.activeJobs.isNotEmpty) {
-                       Navigator.push(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => JobTrackingScreen(jobId: jobProvider.activeJobs.first.id),
+                          builder: (context) => JobTrackingScreen(
+                            jobId: jobProvider.activeJobs.first.id,
+                          ),
                         ),
                       );
                     }
@@ -118,7 +134,11 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             const Spacer(),
-            Switch(value: true, onChanged: (val) {}, activeThumbColor: Colors.white),
+            Switch(
+              value: true,
+              onChanged: (val) {},
+              activeThumbColor: Colors.white,
+            ),
           ],
         ),
       ),

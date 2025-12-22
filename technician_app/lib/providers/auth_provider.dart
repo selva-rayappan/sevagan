@@ -10,6 +10,9 @@ class AuthProvider with ChangeNotifier {
   String? _phoneNumber;
   String? get phoneNumber => _phoneNumber;
 
+  String? _token;
+  String? get token => _token;
+
   AuthProvider() {
     checkLoginStatus();
   }
@@ -18,6 +21,7 @@ class AuthProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _isAuthenticated = prefs.getBool('isAuthenticated') ?? false;
     _phoneNumber = prefs.getString('phoneNumber');
+    _token = prefs.getString('token');
     notifyListeners();
   }
 
@@ -58,6 +62,7 @@ class AuthProvider with ChangeNotifier {
         await prefs.setBool('isAuthenticated', true);
         await prefs.setString('phoneNumber', _phoneNumber!);
         await prefs.setString('token', token);
+        _token = token;
         _isAuthenticated = true;
         notifyListeners();
         return true;
@@ -74,6 +79,7 @@ class AuthProvider with ChangeNotifier {
     await prefs.clear();
     _isAuthenticated = false;
     _phoneNumber = null;
+    _token = null;
     notifyListeners();
   }
 }
