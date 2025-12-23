@@ -28,6 +28,13 @@ Each role has separate UI and permissions.
 
 ## 3. Functional Requirements (Role-Wise)
 
+- Common landing screen for both Customer and Technician App 
+  - with below features 
+    - option to Toggle language (Tamil/ English)
+    - Button to register as Customer or Technician
+- Button to login as Customer or Technician
+
+
 ### 3.1 Customer App – Functional Spec
 
 #### 3.1.1 Authentication
