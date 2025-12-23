@@ -1,279 +1,242 @@
-Sevagan App
+# Sevagan App - Requirements Document
 
-Objective
+## 1. Objective
 
 Build an on-demand hyperlocal services platform connecting customers with local technicians (electrician, plumber, AC, motor, washing machine, bike repair).
 
-MVP Scope
+### MVP Scope
 
-Android-first
+- Android-first
+- Tamil + English
+- Real-time job matching
+- Cash + UPI payments
+- Admin-controlled pricing & commissions
 
-Tamil + English
+---
 
-Real-time job matching
+## 2. User Roles
 
-Cash + UPI payments
+### Roles
 
-Admin-controlled pricing & commissions
-
-2. USER ROLES
-Roles
-
-Customer
-
-Technician
-
-Admin
+1. **Customer**
+2. **Technician**
+3. **Admin**
 
 Each role has separate UI and permissions.
 
-3. FUNCTIONAL REQUIREMENTS (ROLE-WISE)
-3.1 CUSTOMER APP – FUNCTIONAL SPEC
-Authentication
+---
 
-Phone number login
+## 3. Functional Requirements (Role-Wise)
 
-OTP verification
+### 3.1 Customer App – Functional Spec
 
-Auto user creation on first login
+#### 3.1.1 Authentication
 
-Home Screen
+- Phone number login
+- OTP verification
+- Auto user creation on first login
+- Profile Create screen with below details on first login
+  - Name
+  - Address
+  - Phone (Auto populated)
+- After Profile created navigate to Home screen
 
-Service category grid
+#### 3.1.2 Home Screen
 
-Electrician
+- Service category grid:
+  - Electrician
+  - Plumber
+  - Motor Repair
+  - Washing Machine
+  - AC Service
+- Location auto-detect (GPS)
+- Manual location override
 
-Plumber
+#### 3.1.3 Raise Service Request
 
-Motor Repair
+- Select service category
+- Describe issue:
+  - Text
+  - Photo upload (max 3)
+  - Optional voice note
+- Show Address for this service request from profile (Auto Populate)
+- Show estimated price range
+- Confirm booking
 
-Washing Machine
+#### 3.1.4 Job Matching
 
-AC Service
+- Notify nearby technicians (within radius)
+- Show technician details once accepted
+- Live tracking (map view)
 
-Location auto-detect (GPS)
+#### 3.1.5 Job Lifecycle
 
-Manual location override
+1. Requested
+2. Technician assigned
+3. Technician on the way
+4. Job started
+5. Job completed
+6. Payment pending
+7. Completed
 
-Raise Service Request
+#### 3.1.6 Payment
 
-Select service category
+- Cash on service
+- UPI (Razorpay/Cashfree)
+- Show breakup:
+  - Service charge
+  - Platform fee
 
-Describe issue:
+#### 3.1.7 Ratings & Review
 
-Text
+- 1–5 star rating
+- Optional comment
 
-Photo upload (max 3)
+---
 
-Optional voice note
+### 3.2 Technician App – Functional Spec
 
-Show estimated price range
+#### 3.2.1 Authentication & Onboarding
 
-Confirm booking
+- Phone + OTP
+- Profile details:
+  - Name
+  - Skills (multi-select)
+  - Experience (years)
+  - Service radius (km)
+- Document upload:
+  - Aadhaar (image)
+- Status: Pending → Approved (Admin)
 
-Job Matching
+#### 3.2.2 Availability
 
-Notify nearby technicians (within radius)
+- Online / Offline toggle
 
-Show technician details once accepted
+#### 3.2.3 Job Requests
 
-Live tracking (map view)
+- Push notification for new jobs
+- Accept / Reject within time limit
+- Auto-expire if no response
 
-Job Lifecycle
+#### 3.2.4 Job Execution
 
-Requested
+- Navigate to customer (Maps)
+- Start job
+- Complete job
+- Enter final service amount
 
-Technician assigned
+#### 3.2.5 Earnings
 
-Technician on the way
+- Wallet balance
+- Completed jobs list
+- Commission deducted
+- Payout history
 
-Job started
+---
 
-Job completed
+### 3.3 Admin Panel – Functional Spec
 
-Payment pending
+#### 3.3.1 Authentication
 
-Completed
+- Admin login (email + password)
 
-Payment
+#### 3.3.2 Technician Management
 
-Cash on service
+- Add / Delete / Edit technicians (Newly added Technicians are Auto approved)
+- Approve / Reject technicians
+- Enable / disable technicians
+- View documents submitted by technicians
 
-UPI (Razorpay/Cashfree)
+#### 3.3.3 Service Management
 
-Show breakup:
+- Create service categories
+- Set:
+  - Base visit charge
+  - Price range
+  - Commission % or Amount (Editable Field)
 
-Service charge
+#### 3.3.4 Job Monitoring
 
-Platform fee
+- View all service requests
+- Filter by:
+  - Status
+  - City
+  - Technician
+- Manual Assignment of technician to Service Requests (Optional)
+- Manual reassignment or override technician assigned to Service Requests (optional)
 
-Ratings & Review
+#### 3.3.5 Payments & Commission
 
-1–5 star rating
+- View all payments
+- Commission calculation
+- Payout reports
 
-Optional comment
+#### 3.3.6 Analytics Dashboard
 
-3.2 TECHNICIAN APP – FUNCTIONAL SPEC
-Authentication & Onboarding
+- Daily jobs
+- Revenue
+- Active technicians
+- Top service categories
 
-Phone + OTP
+---
 
-Profile details:
+## 4. Non-Functional Requirements
 
-Name
+- Landing screen should have option to Toggle language (Tamil/ English)
+- Tamil language support mandatory
+- Low bandwidth optimized
+- Works on low-end Android phones
+- Secure APIs (JWT)
+- GDPR-style data handling
 
-Skills (multi-select)
+---
 
-Experience (years)
+## 5. System Architecture
 
-Service radius (km)
+### Frontend
 
-Document upload:
+- **Flutter** (Customer + Technician)
+- **React** (Admin Panel)
 
-Aadhaar (image)
+### Backend
 
-Status: Pending → Approved (Admin)
+- **Node.js** (NestJS preferred) OR Spring Boot
+- REST APIs
+- JWT authentication
 
-Availability
+### Database
 
-Online / Offline toggle
+- **PostgreSQL** (preferred)
+- **Redis** (job matching, caching)
 
-Job Requests
+### Infrastructure
 
-Push notification for new jobs
+- AWS / DigitalOcean
+- Single VM or EC2 instance with Docker(MVP)
+- S3 Object storage for images
+- Redis for caching
+- PostgreSQL for database
+- JWT for authentication
+- Nginx for reverse proxy
 
-Accept / Reject within time limit
+---
 
-Auto-expire if no response
+## 6. Database Schema (Detailed)
 
-Job Execution
+### USERS
 
-Navigate to customer (Maps)
-
-Start job
-
-Complete job
-
-Enter final service amount
-
-Earnings
-
-Wallet balance
-
-Completed jobs list
-
-Commission deducted
-
-Payout history
-
-3.3 ADMIN PANEL – FUNCTIONAL SPEC
-Authentication
-
-Admin login (email + password)
-
-Technician Management
-
-Approve / Reject technicians
-
-Enable / disable technicians
-
-View documents
-
-Service Management
-
-Create service categories
-
-Set:
-
-Base visit charge
-
-Price range
-
-Commission %
-
-Job Monitoring
-
-View all service requests
-
-Filter by:
-
-Status
-
-City
-
-Technician
-
-Manual reassignment (optional)
-
-Payments & Commission
-
-View all payments
-
-Commission calculation
-
-Payout reports
-
-Analytics Dashboard
-
-Daily jobs
-
-Revenue
-
-Active technicians
-
-Top service categories
-
-4. NON-FUNCTIONAL REQUIREMENTS
-
-Tamil language support mandatory
-
-Low bandwidth optimized
-
-Works on low-end Android phones
-
-Secure APIs (JWT)
-
-GDPR-style data handling
-
-5. SYSTEM ARCHITECTURE
-Frontend
-
-Flutter (Customer + Technician)
-
-React (Admin Panel)
-
-Backend
-
-Node.js (NestJS preferred) OR Spring Boot
-
-REST APIs
-
-JWT authentication
-
-Database
-
-PostgreSQL (preferred)
-
-Redis (job matching, caching)
-
-Infrastructure
-
-AWS / DigitalOcean
-
-Single VM (MVP)
-
-Object storage for images
-
-6. DATABASE SCHEMA (DETAILED)
-USERS
+```sql
 users (
   id UUID PK,
   phone VARCHAR UNIQUE,
   role ENUM('CUSTOMER','TECHNICIAN','ADMIN'),
   created_at TIMESTAMP
 )
+```
 
-TECHNICIANS
+### TECHNICIANS
+
+```sql
 technicians (
   id UUID PK,
   user_id FK,
@@ -285,16 +248,22 @@ technicians (
   latitude,
   longitude
 )
+```
 
-SERVICE_CATEGORIES
+### SERVICE_CATEGORIES
+
+```sql
 service_categories (
   id UUID PK,
   name,
   base_price,
   commission_percent
 )
+```
 
-SERVICE_REQUESTS
+### SERVICE_REQUESTS
+
+```sql
 service_requests (
   id UUID PK,
   customer_id FK,
@@ -307,8 +276,11 @@ service_requests (
   location_lng,
   created_at
 )
+```
 
-PAYMENTS
+### PAYMENTS
+
+```sql
 payments (
   id UUID PK,
   service_request_id FK,
@@ -316,115 +288,104 @@ payments (
   method ENUM('CASH','UPI'),
   status ENUM
 )
+```
 
-7. API SPECIFICATION (KEY ENDPOINTS)
-Auth
+---
 
-POST /auth/otp
+## 7. API Specification (Key Endpoints)
 
-POST /auth/verify
+### Auth
 
-Customer
+- `POST /auth/otp`
+- `POST /auth/verify`
 
-POST /service-request
+### Customer
 
-GET /service-request/{id}
+- `POST /service-request`
+- `GET /service-request/{id}`
+- `POST /rating`
 
-POST /rating
+### Technician
 
-Technician
+- `GET /jobs/nearby`
+- `POST /jobs/{id}/accept`
+- `POST /jobs/{id}/start`
+- `POST /jobs/{id}/complete`
 
-GET /jobs/nearby
+### Admin
 
-POST /jobs/{id}/accept
+- `GET /admin/technicians`
+- `POST /admin/technician/approve`
+- `GET /admin/analytics`
 
-POST /jobs/{id}/start
+---
 
-POST /jobs/{id}/complete
+## 8. Job Matching Logic
 
-Admin
+1. Find technicians:
+   - Same service category
+   - Within radius (default 5 km)
+   - Online
+2. Notify all eligible technicians
+3. First accept wins
+4. Lock job to technician
 
-GET /admin/technicians
+---
 
-POST /admin/technician/approve
+## 9. Payments Integration
 
-GET /admin/analytics
+### MVP
 
-8. JOB MATCHING LOGIC
+- Cash on service
+- Razorpay UPI intent
 
-Find technicians:
+### Flow
 
-Same service category
+1. Technician enters final amount
+2. Customer pays
+3. Commission auto-calculated
+4. Technician wallet updated
 
-Within radius (default 5 km)
+---
 
-Online
+## 10. Maps & Location
 
-Notify all eligible technicians
+- **Google Maps SDK** / MapMyIndia
+- Features:
+  - Current location
+  - Technician tracking
+  - Navigation link
 
-First accept wins
+---
 
-Lock job to technician
+## 11. Notifications
 
-9. PAYMENTS INTEGRATION
-MVP
+### Push Notifications
 
-Cash on service
+- Firebase Cloud Messaging (FCM)
 
-Razorpay UPI intent
+### Events
 
-Flow
+- Job request
+- Job accepted
+- Technician arriving
+- Job completed
 
-Technician enters final amount
+---
 
-Customer pays
+## 12. UI/UX Guidelines
 
-Commission auto-calculated
+- Simple
+- Large buttons
+- Tamil-first labels
+- Minimal steps
+- Offline fallback messages
 
-Technician wallet updated
+---
 
-10. MAPS & LOCATION
+## 13. MVP Limitations (Intentional)
 
-Google Maps SDK / MapMyIndia
-
-Features:
-
-Current location
-
-Technician tracking
-
-Navigation link
-
-11. NOTIFICATIONS
-Push Notifications
-
-Firebase Cloud Messaging (FCM)
-
-Events
-
-Job request
-
-Job accepted
-
-Technician arriving
-
-Job completed
-
-12. UI/UX GUIDELINES
-
-Simple
-
-Large buttons
-
-Tamil-first labels
-
-Minimal steps
-
-Offline fallback messages
-
-13. MVP LIMITATIONS (INTENTIONAL)
-
-❌ No iOS initially
-❌ No subscriptions
-❌ No chat (call only)
-❌ No AI pricing
+- ❌ No iOS initially
+- ❌ No subscriptions
+- ❌ No chat (call only)
+- ❌ No AI pricing
