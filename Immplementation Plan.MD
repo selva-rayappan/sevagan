@@ -338,8 +338,8 @@ Handle OTP verification
 Store JWT token securely
 Auto-navigate on successful login
 Step 5: Test End-to-End (Day 5)
-Register as customer
-Register as technician
+Customer
+Technician
 Admin approves technician
 Test login flows
 📋 Success Criteria for MVP

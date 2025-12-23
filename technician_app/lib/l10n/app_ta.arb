@@ -15,5 +15,13 @@
   "startJob": "வேலையைத் தொடங்கு",
   "completeJob": "வேலையை முடி",
   "earnings": "வருமானம்",
-  "profile": "விவரக்குறிப்பு"
+  "profile": "விவரக்குறிப்பு",
+  "welcome": "சேவகன் வரவேற்கிறது",
+  "welcomeSubtitle": "உங்கள் வீட்டு வாசலில் உள்ளூர் சேவைகள்",
+  "registerAsCustomer": "வாடிக்கையாளராக பதிவு செய்க",
+  "registerAsTechnician": "தொழில்நுட்ப வல்லுநராக பதிவு செய்க",
+  "loginAsCustomer": "வாடிக்கையாளராக உள்நுழைய",
+  "loginAsTechnician": "தொழில்நுட்ப வல்லுநராக உள்நுழைய",
+  "language": "மொழி",
+  "selectLanguage": "மொழியைத் தேர்ந்தெடுக்கவும்"
 }

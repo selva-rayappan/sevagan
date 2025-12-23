@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final String userRole;
+
+  const LoginScreen({super.key, this.userRole = 'CUSTOMER'});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -131,9 +133,8 @@ class _LoginScreenState extends State<LoginScreen> {
               ],
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: _isLoading
-                    ? null
-                    : (_otpSent ? _verifyOtp : _requestOtp),
+                onPressed:
+                    _isLoading ? null : (_otpSent ? _verifyOtp : _requestOtp),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),

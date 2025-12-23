@@ -52,4 +52,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get upiPayment => 'UPI Payment';
+
+  @override
+  String get welcome => 'Welcome to Sevagan';
+
+  @override
+  String get welcomeSubtitle => 'On-demand local services at your doorstep';
+
+  @override
+  String get registerAsCustomer => 'Register as Customer';
+
+  @override
+  String get registerAsTechnician => 'Register as Technician';
+
+  @override
+  String get loginAsCustomer => 'Login as Customer';
+
+  @override
+  String get loginAsTechnician => 'Login as Technician';
+
+  @override
+  String get language => 'Language';
+
+  @override
+  String get selectLanguage => 'Select Language';
 }

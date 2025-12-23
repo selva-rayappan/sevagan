@@ -58,4 +58,28 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get profile => 'விவரக்குறிப்பு';
+
+  @override
+  String get welcome => 'சேவகன் வரவேற்கிறது';
+
+  @override
+  String get welcomeSubtitle => 'உங்கள் வீட்டு வாசலில் உள்ளூர் சேவைகள்';
+
+  @override
+  String get registerAsCustomer => 'வாடிக்கையாளராக பதிவு செய்க';
+
+  @override
+  String get registerAsTechnician => 'தொழில்நுட்ப வல்லுநராக பதிவு செய்க';
+
+  @override
+  String get loginAsCustomer => 'வாடிக்கையாளராக உள்நுழைய';
+
+  @override
+  String get loginAsTechnician => 'தொழில்நுட்ப வல்லுநராக உள்நுழைய';
+
+  @override
+  String get language => 'மொழி';
+
+  @override
+  String get selectLanguage => 'மொழியைத் தேர்ந்தெடுக்கவும்';
 }

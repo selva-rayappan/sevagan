@@ -15,5 +15,13 @@
   "startJob": "Start Job",
   "completeJob": "Complete Job",
   "earnings": "Earnings",
-  "profile": "Profile"
+  "profile": "Profile",
+  "welcome": "Welcome to Sevagan",
+  "welcomeSubtitle": "On-demand local services at your doorstep",
+  "registerAsCustomer": "Register as Customer",
+  "registerAsTechnician": "Register as Technician",
+  "loginAsCustomer": "Login as Customer",
+  "loginAsTechnician": "Login as Technician",
+  "language": "Language",
+  "selectLanguage": "Select Language"
 }

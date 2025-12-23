@@ -7,7 +7,8 @@ import 'providers/auth_provider.dart';
 import 'providers/job_provider.dart';
 import 'providers/location_provider.dart';
 import 'screens/auth/login_screen.dart';
-import 'screens/home/home_screen.dart';
+import 'screens/landing_screen.dart';
+import 'screens/customer_profile_check_screen.dart';
 import 'package:sevagan_customer/l10n/app_localizations.dart';
 
 /*
@@ -64,8 +65,8 @@ class SevaganCustomerApp extends StatelessWidget {
               ),
             ),
             home: authProvider.isAuthenticated
-                ? const HomeScreen()
-                : const LoginScreen(),
+                ? CustomerProfileCheckScreen(key: UniqueKey())
+                : const LandingScreen(), // Changed from LoginScreen to LandingScreen
           );
         },
       ),

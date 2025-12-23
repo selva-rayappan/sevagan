@@ -5,7 +5,9 @@ import '../../providers/auth_provider.dart';
 import 'otp_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final String userRole;
+
+  const LoginScreen({super.key, this.userRole = 'TECHNICIAN'});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -32,15 +34,16 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-               builder: (context) => OtpScreen(mobileNumber: _phoneController.text),
+              builder: (context) =>
+                  OtpScreen(mobileNumber: _phoneController.text),
             ),
           );
         }
       } catch (e) {
         if (mounted) {
-           ScaffoldMessenger.of(context).showSnackBar(
-             SnackBar(content: Text('Login failed: ${e.toString()}')),
-           );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Login failed: ${e.toString()}')),
+          );
         }
       } finally {
         if (mounted) setState(() => _isLoading = false);

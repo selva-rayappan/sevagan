@@ -14,5 +14,13 @@
   "rateService": "Rate Service",
   "payment": "Payment",
   "cashPayment": "Cash Payment",
-  "upiPayment": "UPI Payment"
+  "upiPayment": "UPI Payment",
+  "welcome": "Welcome to Sevagan",
+  "welcomeSubtitle": "On-demand local services at your doorstep",
+  "registerAsCustomer": "Customer",
+  "registerAsTechnician": "Technician",
+  "loginAsCustomer": "Login as Customer",
+  "loginAsTechnician": "Login as Technician",
+  "language": "Language",
+  "selectLanguage": "Select Language"
 }

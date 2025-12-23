@@ -187,6 +187,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'UPI Payment'**
   String get upiPayment;
+
+  /// No description provided for @welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Sevagan'**
+  String get welcome;
+
+  /// No description provided for @welcomeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'On-demand local services at your doorstep'**
+  String get welcomeSubtitle;
+
+  /// No description provided for @registerAsCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Register as Customer'**
+  String get registerAsCustomer;
+
+  /// No description provided for @registerAsTechnician.
+  ///
+  /// In en, this message translates to:
+  /// **'Register as Technician'**
+  String get registerAsTechnician;
+
+  /// No description provided for @loginAsCustomer.
+  ///
+  /// In en, this message translates to:
+  /// **'Login as Customer'**
+  String get loginAsCustomer;
+
+  /// No description provided for @loginAsTechnician.
+  ///
+  /// In en, this message translates to:
+  /// **'Login as Technician'**
+  String get loginAsTechnician;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @selectLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Language'**
+  String get selectLanguage;
 }
 
 class _AppLocalizationsDelegate

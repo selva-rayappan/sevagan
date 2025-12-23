@@ -6,6 +6,7 @@ import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TechniciansModule } from './technicians/technicians.module';
+import { CustomersModule } from './customers/customers.module';
 import { ServicesModule } from './services/services.module';
 import { JobsModule } from './jobs/jobs.module';
 import { PaymentsModule } from './payments/payments.module';
@@ -24,6 +25,7 @@ import { UploadModule } from './upload/upload.module';
         AuthModule,
         UsersModule,
         TechniciansModule,
+        CustomersModule,
         ServicesModule,
         JobsModule,
         PaymentsModule,

@@ -6,8 +6,7 @@ import 'package:technician_app/l10n/app_localizations.dart';
 import 'core/theme.dart';
 import 'providers/auth_provider.dart';
 import 'providers/job_provider.dart';
-import 'screens/auth/login_screen.dart';
-import 'screens/home_screen.dart';
+import 'screens/landing_screen.dart';
 import 'screens/profile_check_screen.dart';
 
 void main() async {
@@ -24,9 +23,7 @@ class TechnicianApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(
-          create: (_) => JobProvider(),
-        ), // Added this provider
+        ChangeNotifierProvider(create: (_) => JobProvider()),
       ],
       child: Consumer<AuthProvider>(
         builder: (context, auth, _) {
@@ -43,7 +40,7 @@ class TechnicianApp extends StatelessWidget {
             supportedLocales: const [Locale('en', ''), Locale('ta', '')],
             home: auth.isAuthenticated
                 ? ProfileCheckScreen(key: UniqueKey())
-                : const LoginScreen(),
+                : const LandingScreen(), // Changed from LoginScreen to LandingScreen
           );
         },
       ),

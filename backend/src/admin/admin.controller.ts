@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Put, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -42,6 +42,30 @@ export class AdminController {
     @ApiOperation({ summary: 'Reject a technician' })
     async rejectTechnician(@Param('id') id: string) {
         return this.adminService.rejectTechnician(id);
+    }
+
+    @Post('technicians')
+    @ApiOperation({ summary: 'Create a new technician (auto-approved)' })
+    async createTechnician(@Body() data: any) {
+        return this.adminService.createTechnician(data);
+    }
+
+    @Put('technicians/:id')
+    @ApiOperation({ summary: 'Update technician details' })
+    async updateTechnician(@Param('id') id: string, @Body() data: any) {
+        return this.adminService.updateTechnician(id, data);
+    }
+
+    @Delete('technicians/:id')
+    @ApiOperation({ summary: 'Delete a technician' })
+    async deleteTechnician(@Param('id') id: string) {
+        return this.adminService.deleteTechnician(id);
+    }
+
+    @Put('technicians/:id/toggle-status')
+    @ApiOperation({ summary: 'Toggle technician active status' })
+    async toggleTechnicianStatus(@Param('id') id: string, @Body() data: { isActive: boolean }) {
+        return this.adminService.toggleTechnicianStatus(id, data.isActive);
     }
 
     @Get('services')

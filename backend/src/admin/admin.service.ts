@@ -124,12 +124,91 @@ export class AdminService {
     }
 
     async createServiceCategory(data: any) {
-        // Delegate to existing service but wrap with admin permission check logic if needed
-        // Since seeding is in service, maybe we should expose create in services service publicly?
-        // Actually, better to keep modification logic restricted.
-        // For MVP, likely just a direct db insert via ServicesService if exposed, or here.
-        // Let's assume ServicesService doesn't have a public create method yet except seed.
-        // We'll implement a create method in ServicesService and call it.
         return this.servicesService.create(data);
+    }
+
+    async createTechnician(data: any) {
+        // Create user first
+        const user = this.userRepository.create({
+            phone: data.phone,
+            role: UserRole.TECHNICIAN,
+            isActive: true,
+        });
+        const savedUser = await this.userRepository.save(user);
+
+        // Create technician profile with APPROVED status (auto-approved)
+        const technician = this.technicianRepository.create({
+            userId: savedUser.id,
+            name: data.name,
+            skills: data.skills || [],
+            experience: data.experience || 0,
+            serviceRadiusKm: data.serviceRadiusKm || 5.0,
+            status: TechnicianStatus.APPROVED, // Auto-approved
+            aadhaarImageUrl: data.aadhaarImageUrl,
+        });
+
+        return this.technicianRepository.save(technician);
+    }
+
+    async updateTechnician(technicianId: string, data: any) {
+        const technician = await this.technicianRepository.findOne({
+            where: { id: technicianId },
+        });
+
+        if (!technician) {
+            throw new NotFoundException('Technician not found');
+        }
+
+        // Update allowed fields
+        if (data.name) technician.name = data.name;
+        if (data.skills) technician.skills = data.skills;
+        if (data.experience !== undefined) technician.experience = data.experience;
+        if (data.serviceRadiusKm !== undefined) technician.serviceRadiusKm = data.serviceRadiusKm;
+        if (data.aadhaarImageUrl) technician.aadhaarImageUrl = data.aadhaarImageUrl;
+
+        return this.technicianRepository.save(technician);
+    }
+
+    async deleteTechnician(technicianId: string) {
+        const technician = await this.technicianRepository.findOne({
+            where: { id: technicianId },
+            relations: ['user'],
+        });
+
+        if (!technician) {
+            throw new NotFoundException('Technician not found');
+        }
+
+        // Delete technician profile
+        await this.technicianRepository.remove(technician);
+
+        // Also delete the user account
+        if (technician.user) {
+            await this.userRepository.remove(technician.user);
+        }
+
+        return { message: 'Technician deleted successfully' };
+    }
+
+    async toggleTechnicianStatus(technicianId: string, isActive: boolean) {
+        const technician = await this.technicianRepository.findOne({
+            where: { id: technicianId },
+            relations: ['user'],
+        });
+
+        if (!technician) {
+            throw new NotFoundException('Technician not found');
+        }
+
+        // Update user's active status
+        if (technician.user) {
+            technician.user.isActive = isActive;
+            await this.userRepository.save(technician.user);
+        }
+
+        return this.technicianRepository.findOne({
+            where: { id: technicianId },
+            relations: ['user'],
+        });
     }
 }
