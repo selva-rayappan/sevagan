@@ -60,10 +60,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeSubtitle => 'On-demand local services at your doorstep';
 
   @override
-  String get registerAsCustomer => 'Register as Customer';
+  String get registerAsCustomer => 'Customer';
 
   @override
-  String get registerAsTechnician => 'Register as Technician';
+  String get registerAsTechnician => 'Technician';
 
   @override
   String get loginAsCustomer => 'Login as Customer';

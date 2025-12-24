@@ -125,6 +125,25 @@ export class JobsService {
         return request;
     }
 
+    async rejectJob(
+        serviceRequestId: string,
+        technicianId: string,
+    ): Promise<{ message: string }> {
+        const request = await this.findById(serviceRequestId);
+
+        // Validate that job is available
+        if (request.status !== ServiceRequestStatus.REQUESTED) {
+            throw new BadRequestException('Job is not available for rejection');
+        }
+
+        // Log the rejection (optional - could track which technicians rejected which jobs)
+        console.log(`Technician ${technicianId} rejected job ${serviceRequestId}`);
+
+        // For now, we just return success - the job stays available for other technicians
+        // In the future, you could track rejections in a separate table
+        return { message: 'Job rejected successfully' };
+    }
+
     async startJob(
         serviceRequestId: string,
         technicianId: string,
@@ -262,7 +281,7 @@ export class JobsService {
         return this.serviceRequestRepository.find({
             where: {
                 status: ServiceRequestStatus.REQUESTED,
-                technicianId: null, // Note: This requires .IsNull() logic if strict, but null works in simple find
+                technicianId: IsNull(), // Use IsNull() for proper null checking
             },
             relations: ['customer', 'serviceCategory'],
             order: { createdAt: 'DESC' },

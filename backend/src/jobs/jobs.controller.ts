@@ -8,6 +8,7 @@ import {
     UseGuards,
     UseInterceptors,
     UploadedFiles,
+    NotFoundException,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
@@ -91,7 +92,21 @@ export class JobsController {
     @ApiOperation({ summary: 'Accept service request' })
     async acceptJob(@Param('id') id: string, @GetUser() user: User) {
         const technician = await this.techniciansService.findByUserId(user.id);
+        if (!technician) {
+            throw new NotFoundException('Technician profile not found');
+        }
         return this.jobsService.acceptJob(id, technician.id);
+    }
+
+    @Post(':id/reject')
+    @Roles(UserRole.TECHNICIAN)
+    @ApiOperation({ summary: 'Reject service request' })
+    async rejectJob(@Param('id') id: string, @GetUser() user: User) {
+        const technician = await this.techniciansService.findByUserId(user.id);
+        if (!technician) {
+            throw new NotFoundException('Technician profile not found');
+        }
+        return this.jobsService.rejectJob(id, technician.id);
     }
 
     @Post(':id/start')

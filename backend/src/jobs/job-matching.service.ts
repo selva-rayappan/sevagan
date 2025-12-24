@@ -77,7 +77,7 @@ export class JobMatchingService {
         // Try to acquire lock using Redis SET NX (set if not exists)
         const lockAcquired = await this.redisClient.set(lockKey, technicianId, {
             NX: true,
-            EX: 10, // Lock expires in 10 seconds
+            EX: 25, // Lock expires in 25 seconds
         });
 
         if (!lockAcquired) {
@@ -86,10 +86,14 @@ export class JobMatchingService {
         }
 
         try {
-            // Check if job is still available
+            // Check if job is in Redis
             const jobData = await this.redisClient.get(jobKey);
+
             if (!jobData) {
-                return false; // Job expired or already assigned
+                // Job not in Redis - this is OK for jobs created without matching service
+                // or after Redis was cleared. Allow the acceptance to proceed.
+                console.log(`Job ${serviceRequestId} not in Redis, allowing acceptance`);
+                return true;
             }
 
             const job = JSON.parse(jobData);

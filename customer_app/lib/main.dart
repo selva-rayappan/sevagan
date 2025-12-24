@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/job_provider.dart';
 import 'providers/location_provider.dart';
+import 'providers/locale_provider.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/landing_screen.dart';
 import 'screens/customer_profile_check_screen.dart';
@@ -37,12 +38,14 @@ class SevaganCustomerApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => JobProvider()),
         ChangeNotifierProvider(create: (_) => LocationProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
-      child: Consumer<AuthProvider>(
-        builder: (context, authProvider, _) {
+      child: Consumer2<AuthProvider, LocaleProvider>(
+        builder: (context, authProvider, localeProvider, _) {
           return MaterialApp(
             title: 'Sevagan',
             debugShowCheckedModeBanner: false,
+            locale: localeProvider.locale,
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,

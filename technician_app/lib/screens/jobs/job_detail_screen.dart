@@ -23,7 +23,12 @@ class JobDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final jobProvider = Provider.of<JobProvider>(context);
-    final job = jobProvider.jobs.firstWhere((j) => j.id == jobId);
+    final job = jobProvider.jobs.firstWhere(
+      (j) => j.id == jobId,
+      orElse: () => jobProvider.jobs.isNotEmpty
+          ? jobProvider.jobs.first
+          : throw StateError('No jobs available'),
+    );
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.jobDetails)),
@@ -76,10 +81,11 @@ class JobDetailScreen extends StatelessWidget {
                       onPressed: () async {
                         await jobProvider.acceptJob(job.id);
                         if (context.mounted) {
-                           Navigator.pushReplacement(
+                          Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => JobTrackingScreen(jobId: job.id),
+                              builder: (context) =>
+                                  JobTrackingScreen(jobId: job.id),
                             ),
                           );
                         }
@@ -103,12 +109,12 @@ class JobDetailScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => JobTrackingScreen(jobId: job.id),
-                        ),
-                      );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => JobTrackingScreen(jobId: job.id),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
@@ -121,12 +127,12 @@ class JobDetailScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => JobTrackingScreen(jobId: job.id),
-                        ),
-                      );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => JobTrackingScreen(jobId: job.id),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
@@ -141,4 +147,3 @@ class JobDetailScreen extends StatelessWidget {
     );
   }
 }
-

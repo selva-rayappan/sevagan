@@ -31,9 +31,11 @@ Each role has separate UI and permissions.
 - Common landing screen for both Customer and Technician App 
   - with below features 
     - option to Toggle language (Tamil/ English)
-    - Button to register as Customer or Technician
-- Button to login as Customer or Technician
-
+    - Button for Customer and Technician
+    - After OTP validation if Customer already exists navigate to Home screen
+    - If Customer doesn't exist navigate to Profile Create screen
+    - If Technician already exists navigate to Home screen
+    - If Technician doesn't exist navigate to Profile Create screen
 
 ### 3.1 Customer App – Functional Spec
 

@@ -5,6 +5,7 @@ import '../../providers/location_provider.dart';
 import '../../models/service_category.dart';
 import '../../services/api_service.dart';
 import '../jobs/create_job_screen.dart';
+import '../landing_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -33,7 +34,8 @@ class _HomeScreenState extends State<HomeScreen> {
     // Load service categories
     try {
       final apiService = ApiService();
-      final categories = await apiService.getServiceCategories(authProvider.token!);
+      final categories =
+          await apiService.getServiceCategories(authProvider.token!);
       setState(() {
         _categories = categories;
         _isLoading = false;
@@ -52,8 +54,16 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              context.read<AuthProvider>().logout();
+            tooltip: 'Logout',
+            onPressed: () async {
+              await context.read<AuthProvider>().logout();
+              if (mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => const LandingScreen()),
+                  (route) => false,
+                );
+              }
             },
           ),
         ],
@@ -109,7 +119,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        locationProvider.currentAddress ?? 'Fetching location...',
+                        locationProvider.currentAddress ??
+                            'Fetching location...',
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ],
@@ -155,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-               builder: (context) => CreateJobScreen(category: category),
+              builder: (context) => CreateJobScreen(category: category),
             ),
           );
         },

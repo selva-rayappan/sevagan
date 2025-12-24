@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:technician_app/l10n/app_localizations.dart';
 import '../providers/auth_provider.dart';
 import '../providers/job_provider.dart';
-import 'auth/login_screen.dart';
+import '../providers/availability_provider.dart';
+import 'landing_screen.dart';
 import 'jobs/job_requests_screen.dart';
 import 'jobs/job_tracking_screen.dart';
 
@@ -35,13 +36,17 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () {
-              authProvider.logout();
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                (route) => false,
-              );
+            tooltip: 'Logout',
+            onPressed: () async {
+              await authProvider.logout();
+              if (mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const LandingScreen(),
+                  ),
+                  (route) => false,
+                );
+              }
             },
           ),
         ],
@@ -108,40 +113,62 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStatusCard(BuildContext context, JobProvider provider) {
-    return Card(
-      color: Colors.blue, // TODO: Toggle color based on status
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            const Icon(Icons.flash_on, color: Colors.white, size: 32),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return Consumer<AvailabilityProvider>(
+      builder: (context, availabilityProvider, _) {
+        return Card(
+          color: availabilityProvider.isOnline ? Colors.green : Colors.grey,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
               children: [
-                Text(
-                  'Status',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleSmall?.copyWith(color: Colors.white70),
+                Icon(
+                  availabilityProvider.isOnline
+                      ? Icons.flash_on
+                      : Icons.flash_off,
+                  color: Colors.white,
+                  size: 32,
                 ),
-                Text(
-                  'Online', // TODO: Toggle status
-                  style: Theme.of(
-                    context,
-                  ).textTheme.headlineSmall?.copyWith(color: Colors.white),
+                const SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Status',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleSmall?.copyWith(color: Colors.white70),
+                    ),
+                    Text(
+                      availabilityProvider.isOnline ? 'Online' : 'Offline',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineSmall?.copyWith(color: Colors.white),
+                    ),
+                  ],
                 ),
+                const Spacer(),
+                availabilityProvider.isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : Switch(
+                        value: availabilityProvider.isOnline,
+                        onChanged: (val) {
+                          availabilityProvider.setOnlineStatus(val);
+                        },
+                        activeColor: Colors.white,
+                        activeTrackColor: Colors.green[300],
+                      ),
               ],
             ),
-            const Spacer(),
-            Switch(
-              value: true,
-              onChanged: (val) {},
-              activeThumbColor: Colors.white,
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

@@ -203,13 +203,13 @@ abstract class AppLocalizations {
   /// No description provided for @registerAsCustomer.
   ///
   /// In en, this message translates to:
-  /// **'Register as Customer'**
+  /// **'Customer'**
   String get registerAsCustomer;
 
   /// No description provided for @registerAsTechnician.
   ///
   /// In en, this message translates to:
-  /// **'Register as Technician'**
+  /// **'Technician'**
   String get registerAsTechnician;
 
   /// No description provided for @loginAsCustomer.

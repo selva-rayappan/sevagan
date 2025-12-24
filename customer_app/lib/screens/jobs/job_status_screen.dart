@@ -55,8 +55,10 @@ class _JobStatusScreenState extends State<JobStatusScreen> {
   }
 
   void _callTechnician() {
-    if (_job?.technician?['user']?['phone'] != null) {
-      launchUrl(Uri.parse('tel:${_job!.technician!['user']['phone']}'));
+    // Phone is in the user object which is a relation of technician
+    final phone = _job?.technician?['user']?['phone'];
+    if (phone != null) {
+      launchUrl(Uri.parse('tel:$phone'));
     }
   }
 
@@ -206,7 +208,7 @@ class _JobStatusScreenState extends State<JobStatusScreen> {
     return Card(
       child: ListTile(
         leading: const CircleAvatar(child: Icon(Icons.person)),
-        title: Text(_job!.technician!['user']?['name'] ?? 'Unknown Technician'),
+        title: Text(_job!.technician!['name'] ?? 'Unknown Technician'),
         subtitle: Text(
             'Rating: ${(_job!.technician!['rating'] ?? 0.0).toStringAsFixed(1)} ★'),
         trailing: IconButton(
