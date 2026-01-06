@@ -11,6 +11,10 @@ class Job {
   final double price;
   final DateTime createdAt;
   JobStatus status;
+  final DateTime? preferredDateTime;
+  final DateTime? proposedDateTime;
+  final String? schedulingStatus;
+  final String? schedulingNote;
 
   Job({
     required this.id,
@@ -23,5 +27,9 @@ class Job {
     required this.price,
     required this.createdAt,
     this.status = JobStatus.pending,
+    this.preferredDateTime,
+    this.proposedDateTime,
+    this.schedulingStatus,
+    this.schedulingNote,
   });
 }

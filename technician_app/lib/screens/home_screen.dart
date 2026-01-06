@@ -7,6 +7,7 @@ import '../providers/availability_provider.dart';
 import 'landing_screen.dart';
 import 'jobs/job_requests_screen.dart';
 import 'jobs/job_tracking_screen.dart';
+import 'jobs/active_jobs_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,9 +20,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch available jobs when home screen loads
+    // Fetch assigned jobs when home screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<JobProvider>().fetchAvailableJobs();
+      context.read<JobProvider>().fetchMyJobs();
     });
   }
 
@@ -81,16 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.work,
                   color: Colors.blue,
                   onTap: () {
-                    if (jobProvider.activeJobs.isNotEmpty) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => JobTrackingScreen(
-                            jobId: jobProvider.activeJobs.first.id,
-                          ),
-                        ),
-                      );
-                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ActiveJobsScreen(),
+                      ),
+                    );
                   },
                 ),
                 const SizedBox(height: 16),
@@ -161,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         onChanged: (val) {
                           availabilityProvider.setOnlineStatus(val);
                         },
-                        activeColor: Colors.white,
+                        activeThumbColor: Colors.white,
                         activeTrackColor: Colors.green[300],
                       ),
               ],

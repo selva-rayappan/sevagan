@@ -7,7 +7,6 @@ import 'providers/auth_provider.dart';
 import 'providers/job_provider.dart';
 import 'providers/location_provider.dart';
 import 'providers/locale_provider.dart';
-import 'screens/auth/login_screen.dart';
 import 'screens/landing_screen.dart';
 import 'screens/customer_profile_check_screen.dart';
 import 'package:sevagan_customer/l10n/app_localizations.dart';

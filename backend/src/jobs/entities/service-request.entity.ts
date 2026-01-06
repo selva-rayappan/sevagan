@@ -104,6 +104,18 @@ export class ServiceRequest {
     @Column({ nullable: true })
     startJobOtp: string;
 
+    @Column({ type: 'timestamp', nullable: true })
+    preferredDateTime: Date;
+
+    @Column({ type: 'timestamp', nullable: true })
+    proposedDateTime: Date;
+
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    schedulingStatus: string; // 'PENDING' | 'ACCEPTED' | 'PROPOSED' | 'CONFIRMED'
+
+    @Column({ type: 'text', nullable: true })
+    schedulingNote: string;
+
     @CreateDateColumn()
     createdAt: Date;
 

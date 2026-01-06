@@ -5,6 +5,7 @@ import '../../providers/location_provider.dart';
 import '../../models/service_category.dart';
 import '../../services/api_service.dart';
 import '../jobs/create_job_screen.dart';
+import '../jobs/my_jobs_screen.dart';
 import '../landing_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -79,6 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildLocationCard(),
+                    const SizedBox(height: 16),
+                    _buildMyJobsButton(),
                     const SizedBox(height: 24),
                     const Text(
                       'Select Service',
@@ -219,5 +222,59 @@ class _HomeScreenState extends State<HomeScreen> {
       default:
         return Icons.build;
     }
+  }
+
+  Widget _buildMyJobsButton() {
+    return Card(
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MyJobsScreen(),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.history, color: Colors.blue, size: 24),
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'My Service Requests',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'View your request history',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

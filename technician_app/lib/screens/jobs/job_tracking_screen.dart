@@ -36,7 +36,7 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
   Future<void> _loadJobDetails() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
+      final token = prefs.getString('token');
 
       final response = await Dio().get(
         '${ApiConstants.baseUrl}/jobs/${widget.jobId}',
@@ -90,7 +90,7 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
+      final token = prefs.getString('token');
 
       await Dio().post(
         '${ApiConstants.baseUrl}/jobs/${widget.jobId}/start',
@@ -119,7 +119,7 @@ class _JobTrackingScreenState extends State<JobTrackingScreen> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
+      final token = prefs.getString('token');
 
       await Dio().post(
         '${ApiConstants.baseUrl}/jobs/${widget.jobId}/complete',

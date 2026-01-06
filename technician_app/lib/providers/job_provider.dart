@@ -68,6 +68,14 @@ class JobProvider with ChangeNotifier {
                 createdAt: DateTime.parse(json['createdAt']),
                 status: JobStatus
                     .pending, // Explicitly set as pending for this list
+                preferredDateTime: json['preferredDateTime'] != null
+                    ? DateTime.parse(json['preferredDateTime'])
+                    : null,
+                proposedDateTime: json['proposedDateTime'] != null
+                    ? DateTime.parse(json['proposedDateTime'])
+                    : null,
+                schedulingStatus: json['schedulingStatus'],
+                schedulingNote: json['schedulingNote'],
               ),
             )
             .toList();
@@ -84,6 +92,86 @@ class JobProvider with ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> fetchMyJobs() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        print('No token found, user not authenticated');
+        return;
+      }
+
+      print('Fetching my jobs with token: ${token.substring(0, 20)}...');
+      print('API URL: ${ApiConstants.baseUrl}/jobs/my-jobs');
+
+      final response = await Dio().get(
+        '${ApiConstants.baseUrl}/jobs/my-jobs',
+        options: Options(headers: {'Authorization': 'Bearer $token'}),
+      );
+
+      print('My jobs API response status: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        print('Received ${data.length} assigned jobs from API');
+
+        _jobs = data
+            .map(
+              (json) => Job(
+                id: json['id'],
+                customerName: json['customer']?['name'] ?? 'Unknown Customer',
+                serviceType: json['serviceCategory']?['name'] ?? 'Service',
+                description: json['description'],
+                address: json['locationAddress'] ?? 'Unknown Location',
+                latitude: (json['locationLat'] as num).toDouble(),
+                longitude: (json['locationLng'] as num).toDouble(),
+                price: (json['estimatedPrice'] as num).toDouble(),
+                createdAt: DateTime.parse(json['createdAt']),
+                status: _parseJobStatus(json['status']),
+                preferredDateTime: json['preferredDateTime'] != null
+                    ? DateTime.parse(json['preferredDateTime'])
+                    : null,
+                proposedDateTime: json['proposedDateTime'] != null
+                    ? DateTime.parse(json['proposedDateTime'])
+                    : null,
+                schedulingStatus: json['schedulingStatus'],
+                schedulingNote: json['schedulingNote'],
+              ),
+            )
+            .toList();
+
+        print('Successfully mapped ${_jobs.length} assigned jobs');
+      }
+    } catch (e) {
+      print('Error fetching my jobs: $e');
+      if (e is DioException) {
+        print('Dio error type: ${e.type}');
+        print('Dio error message: ${e.message}');
+        print('Dio error response: ${e.response?.data}');
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  JobStatus _parseJobStatus(String status) {
+    switch (status) {
+      case 'TECHNICIAN_ASSIGNED':
+        return JobStatus.accepted;
+      case 'JOB_STARTED':
+        return JobStatus.started;
+      case 'JOB_COMPLETED':
+        return JobStatus.completed;
+      default:
+        return JobStatus.pending;
     }
   }
 

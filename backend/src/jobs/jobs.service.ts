@@ -37,6 +37,7 @@ export class JobsService {
             customerId,
             estimatedPrice: category.basePrice,
             status: ServiceRequestStatus.REQUESTED,
+            schedulingStatus: data.preferredDateTime ? 'PENDING' : null,
         });
 
         const saved = await this.serviceRequestRepository.save(serviceRequest);
@@ -286,5 +287,70 @@ export class JobsService {
             relations: ['customer', 'serviceCategory'],
             order: { createdAt: 'DESC' },
         });
+    }
+
+    async acceptScheduledTime(
+        serviceRequestId: string,
+        technicianId: string,
+    ): Promise<ServiceRequest> {
+        const request = await this.findById(serviceRequestId);
+
+        if (request.technicianId !== technicianId) {
+            throw new BadRequestException('Not authorized for this job');
+        }
+
+        await this.serviceRequestRepository.update(serviceRequestId, {
+            schedulingStatus: 'ACCEPTED',
+        });
+
+        return this.findById(serviceRequestId);
+    }
+
+    async proposeAlternativeTime(
+        serviceRequestId: string,
+        technicianId: string,
+        proposedDateTime: Date,
+        note?: string,
+    ): Promise<ServiceRequest> {
+        const request = await this.findById(serviceRequestId);
+
+        if (request.technicianId !== technicianId) {
+            throw new BadRequestException('Not authorized for this job');
+        }
+
+        // Validate proposed time is in future
+        if (new Date(proposedDateTime) <= new Date()) {
+            throw new BadRequestException('Proposed time must be in the future');
+        }
+
+        await this.serviceRequestRepository.update(serviceRequestId, {
+            proposedDateTime: new Date(proposedDateTime),
+            schedulingStatus: 'PROPOSED',
+            schedulingNote: note,
+        });
+
+        return this.findById(serviceRequestId);
+    }
+
+    async confirmProposedTime(
+        serviceRequestId: string,
+        customerId: string,
+    ): Promise<ServiceRequest> {
+        const request = await this.findById(serviceRequestId);
+
+        if (request.customerId !== customerId) {
+            throw new BadRequestException('Not authorized for this job');
+        }
+
+        if (request.schedulingStatus !== 'PROPOSED') {
+            throw new BadRequestException('No proposed time to confirm');
+        }
+
+        await this.serviceRequestRepository.update(serviceRequestId, {
+            schedulingStatus: 'CONFIRMED',
+            preferredDateTime: request.proposedDateTime,
+        });
+
+        return this.findById(serviceRequestId);
     }
 }

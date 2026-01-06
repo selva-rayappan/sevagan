@@ -153,4 +153,36 @@ export class JobsController {
     ) {
         return this.jobsService.rateJob(id, user.id, data.rating, data.comment);
     }
+
+    @Post(':id/accept-time')
+    @Roles(UserRole.TECHNICIAN)
+    @ApiOperation({ summary: 'Accept customer preferred time' })
+    async acceptScheduledTime(@Param('id') id: string, @GetUser() user: User) {
+        const technician = await this.techniciansService.findByUserId(user.id);
+        return this.jobsService.acceptScheduledTime(id, technician.id);
+    }
+
+    @Post(':id/propose-time')
+    @Roles(UserRole.TECHNICIAN)
+    @ApiOperation({ summary: 'Propose alternative time' })
+    async proposeAlternativeTime(
+        @Param('id') id: string,
+        @GetUser() user: User,
+        @Body() data: { proposedDateTime: string; note?: string },
+    ) {
+        const technician = await this.techniciansService.findByUserId(user.id);
+        return this.jobsService.proposeAlternativeTime(
+            id,
+            technician.id,
+            new Date(data.proposedDateTime),
+            data.note,
+        );
+    }
+
+    @Post(':id/confirm-time')
+    @Roles(UserRole.CUSTOMER)
+    @ApiOperation({ summary: 'Confirm proposed time' })
+    async confirmProposedTime(@Param('id') id: string, @GetUser() user: User) {
+        return this.jobsService.confirmProposedTime(id, user.id);
+    }
 }

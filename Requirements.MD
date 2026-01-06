@@ -68,6 +68,11 @@ Each role has separate UI and permissions.
   - Text
   - Photo upload (max 3)
   - Optional voice note
+- **Schedule visit time (Optional):**
+  - Toggle "Schedule for later"
+  - Select preferred date (up to 30 days ahead)
+  - Select preferred time
+  - Minimum 1 hour from now
 - Show Address for this service request from profile (Auto Populate)
 - Show estimated price range
 - Confirm booking
@@ -101,6 +106,18 @@ Each role has separate UI and permissions.
 - 1–5 star rating
 - Optional comment
 
+#### 3.1.8 Scheduled Visit Management
+
+- View preferred visit time (if scheduled)
+- View technician's proposed alternative time
+- Scheduling status:
+  - Pending: Waiting for technician response
+  - Accepted: Technician accepted preferred time
+  - Proposed: Technician suggested different time
+  - Confirmed: Customer confirmed proposed time
+- Confirm technician's proposed time
+- View scheduling notes from technician
+
 ---
 
 ### 3.2 Technician App – Functional Spec
@@ -124,16 +141,22 @@ Each role has separate UI and permissions.
 #### 3.2.3 Job Requests
 
 - Push notification for new jobs
+- View customer's preferred visit time (if scheduled)
 - Accept / Reject within time limit
+- **Scheduling options when accepting:**
+  - Accept customer's preferred time
+  - Propose alternative time with optional note
 - Auto-expire if no response
 
 #### 3.2.4 Job Execution
 
+- View confirmed visit time
 - Navigate to customer (Maps)
 - Start job
 - Complete job
 - Enter final service amount
 
+---
 #### 3.2.5 Earnings
 
 - Wallet balance

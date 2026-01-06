@@ -1,13 +1,15 @@
 # Quick Start - Testing New Features
 
 ## 🚀 Quick Commands
+docker-compose up -d
 
 ### Start Backend
 ```bash
 cd c:\Users\selvakumar.rayappan\Documents\sevagan\sevagan\backend
 npm run start:dev
 ```
-
+npm run migration:generate -- src/database/migrations/InitialSchema
+npm run migration:run
 ### Start Customer App
 ```bash
 cd c:\Users\selvakumar.rayappan\Documents\sevagan\sevagan\customer_app

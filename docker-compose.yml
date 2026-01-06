@@ -28,7 +28,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: sevagan-backend
     environment:
       NODE_ENV: development
@@ -67,11 +67,11 @@ services:
       - /app/node_modules
     networks:
       - sevagan-network
-    command: npm run dev
 
 volumes:
   postgres_data:
   redis_data:
+
 
 networks:
   sevagan-network:
