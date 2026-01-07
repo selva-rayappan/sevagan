@@ -11,12 +11,5 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: DEBUG – list .github folder
-        run: |
-          echo "PWD:"
-          pwd
-          echo "Listing .github:"
-          ls -R .github || true
-
       - name: Run DevSecOps Validator
-        uses: ./.github/actions/devsecops-validator/action.yml
+        uses: ./.github/actions/devsecops-validator
