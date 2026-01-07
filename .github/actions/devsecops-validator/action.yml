@@ -1,8 +1,137 @@
-name: DevSecOps Validator
-description: Composite DevSecOps validation action
+name: DevSecOps Code Validator
+description: Security, quality, dependency, and best-practice validation for Java, Node, and Python repositories
+
+inputs:
+  java-version:
+    description: Java version
+    required: false
+    default: "17"
+
+  node-version:
+    description: Node.js version
+    required: false
+    default: "18"
+
+  python-version:
+    description: Python version
+    required: false
+    default: "3.10"
 
 runs:
   using: composite
   steps:
-    - shell: bash
-      run: echo "DevSecOps composite action is running"
+
+    # -------------------------------------------------
+    # Sanity
+    # -------------------------------------------------
+    - name: Action Start
+      shell: bash
+      run: echo "Starting DevSecOps validation"
+
+    # -------------------------------------------------
+    # Secrets Scan (Gitleaks)
+    # -------------------------------------------------
+    - name: Secrets Scan – Gitleaks
+      shell: bash
+      run: |
+        docker run --rm \
+          -v "$PWD:/repo" \
+          zricethezav/gitleaks:latest detect \
+          --source=/repo \
+          --no-git || true
+
+    # -------------------------------------------------
+    # Universal SAST – Semgrep
+    # -------------------------------------------------
+    - name: SAST – Semgrep
+      shell: bash
+      run: |
+        docker run --rm \
+          -v "$PWD:/src" \
+          returntocorp/semgrep semgrep scan --config=auto /src || true
+
+    # -------------------------------------------------
+    # Java / Spring Boot
+    # -------------------------------------------------
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: temurin
+
+    - name: Java Build & Tests
+      shell: bash
+      run: |
+        if [ -f pom.xml ]; then
+          mvn -B clean verify || true
+        elif [ -f build.gradle ] || [ -f build.gradle.kts ]; then
+          ./gradlew clean build || true
+        else
+          echo "No Java project detected"
+        fi
+
+    - name: Java Dependency Scan – OWASP Dependency Check
+      shell: bash
+      run: |
+        if [ -f pom.xml ] || [ -f build.gradle ] || [ -f build.gradle.kts ]; then
+          docker run --rm \
+            -v "$PWD:/src" \
+            owasp/dependency-check \
+            --scan /src \
+            --format HTML || true
+        else
+          echo "Skipping Java dependency check"
+        fi
+
+    # -------------------------------------------------
+    # Node / React
+    # -------------------------------------------------
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Node / React Checks
+      shell: bash
+      run: |
+        if [ -f package.json ]; then
+          npm ci || true
+          npm run lint || true
+          npm audit --audit-level=high || true
+        else
+          echo "No Node project detected"
+        fi
+
+    # -------------------------------------------------
+    # Python
+    # -------------------------------------------------
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Python Security & Quality
+      shell: bash
+      run: |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt || true
+          pip install bandit flake8 pip-audit || true
+          bandit -r . -ll || true
+          flake8 . || true
+          pip-audit || true
+        else
+          echo "No Python project detected"
+        fi
+
+    # -------------------------------------------------
+    # Final Summary
+    # -------------------------------------------------
+    - name: Validation Summary
+      shell: bash
+      run: |
+        echo "======================================"
+        echo " DevSecOps Validation Completed"
+        echo " - All scanners executed"
+        echo " - Non-blocking mode enabled"
+        echo " - Review logs for findings"
+        echo "======================================"
