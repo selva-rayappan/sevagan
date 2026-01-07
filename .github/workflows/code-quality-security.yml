@@ -68,7 +68,7 @@ jobs:
           fi
 
       - name: OWASP Dependency Check (Java)
-        uses: dependency-check/Dependency-Check_Action@v5
+        uses: dependency-check/Dependency-Check_Action@main
         with:
           project: "springboot-app"
           path: "."
