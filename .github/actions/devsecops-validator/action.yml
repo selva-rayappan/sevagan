@@ -1,0 +1,146 @@
+name: DevSecOps Code Validator
+description: Security, Quality, Dependency & Performance validation for Java, React, and Python
+
+inputs:
+  java-version:
+    required: false
+    default: "17"
+  node-version:
+    required: false
+    default: "18"
+  python-version:
+    required: false
+    default: "3.10"
+  run-lighthouse:
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+
+    # ---------------------------
+    # Checkout
+    # ---------------------------
+    - uses: actions/checkout@v4
+
+    # ---------------------------
+    # Secrets Scan
+    # ---------------------------
+    - name: Gitleaks
+      uses: zricethezav/gitleaks-action@v2
+      with:
+        fail: false
+
+    # ---------------------------
+    # Semgrep SAST
+    # ---------------------------
+    - name: Semgrep
+      uses: returntocorp/semgrep-action@v1
+      with:
+        config: auto
+      env:
+        SEMGREP_APP_TOKEN: ${{ env.SEMGREP_APP_TOKEN }}
+
+    # ---------------------------
+    # Java
+    # ---------------------------
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: temurin
+        cache: maven
+
+    - name: Java Build
+      shell: bash
+      run: |
+        if [ -f pom.xml ]; then
+          mvn -B clean verify || true
+        elif [ -f build.gradle ] || [ -f build.gradle.kts ]; then
+          ./gradlew clean build || true
+        else
+          echo "No Java project"
+        fi
+
+    - name: OWASP Dependency Check
+      shell: bash
+      run: |
+        if [ -f pom.xml ] || [ -f build.gradle ] || [ -f build.gradle.kts ]; then
+          docker run --rm \
+            -v "$PWD:/src" \
+            owasp/dependency-check \
+            --scan /src \
+            --format HTML || true
+        else
+          echo "Skipping dependency-check"
+        fi
+
+    # ---------------------------
+    # SonarCloud
+    # ---------------------------
+    - name: SonarCloud
+      uses: SonarSource/sonarcloud-github-action@v2
+      env:
+        SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+
+    # ---------------------------
+    # Node / React
+    # ---------------------------
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Node Checks
+      shell: bash
+      run: |
+        if [ -f package.json ]; then
+          npm ci || true
+          npm run lint || true
+          npm audit --audit-level=high || true
+        else
+          echo "No Node project"
+        fi
+
+    # ---------------------------
+    # Python
+    # ---------------------------
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Python Checks
+      shell: bash
+      run: |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt || true
+          pip install bandit flake8 pip-audit || true
+          bandit -r . -ll || true
+          flake8 . || true
+          pip-audit || true
+        else
+          echo "No Python project"
+        fi
+
+    # ---------------------------
+    # Lighthouse (Optional)
+    # ---------------------------
+    - name: Lighthouse
+      if: inputs.run-lighthouse == 'true'
+      uses: treosh/lighthouse-ci-action@v11
+      with:
+        urls: http://localhost:3000
+
+    # ---------------------------
+    # Summary
+    # ---------------------------
+    - name: Summary
+      shell: bash
+      run: |
+        echo "===================================="
+        echo " DevSecOps Validation Completed"
+        echo " All scans executed (non-blocking)"
+        echo " Review logs for findings"
+        echo "===================================="
