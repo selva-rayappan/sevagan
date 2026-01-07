@@ -8,4 +8,10 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/devsecops-validator
+      # REQUIRED for local actions
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Run your local composite action
+      - name: Run DevSecOps Validator
+        uses: ./.github/actions/devsecops-validator
