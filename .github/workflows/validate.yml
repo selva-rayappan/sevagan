@@ -8,10 +8,15 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      # REQUIRED for local actions
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Run your local composite action
+      - name: DEBUG – list .github folder
+        run: |
+          echo "PWD:"
+          pwd
+          echo "Listing .github:"
+          ls -R .github || true
+
       - name: Run DevSecOps Validator
         uses: ./.github/actions/devsecops-validator
