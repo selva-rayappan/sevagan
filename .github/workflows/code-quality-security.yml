@@ -1,0 +1,161 @@
+name: Code Quality, Security & Performance Gate
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        java-version: [17]
+        node-version: [18]
+        python-version: ["3.10"]
+
+    steps:
+      # --------------------------------------------------
+      # Checkout
+      # --------------------------------------------------
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # --------------------------------------------------
+      # Secrets scanning (FAIL FAST)
+      # --------------------------------------------------
+      - name: Gitleaks – Secrets Scan
+        uses: zricethezav/gitleaks-action@v2
+        with:
+          fail: true
+
+      # --------------------------------------------------
+      # Semgrep – Universal SAST (Java, JS, Python)
+      # --------------------------------------------------
+      - name: Semgrep Security Scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: auto
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+
+      # --------------------------------------------------
+      # Java / Spring Boot
+      # --------------------------------------------------
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: temurin
+          cache: maven
+
+      - name: Build & Test Spring Boot
+        run: |
+          if [ -f "pom.xml" ]; then
+            mvn -B clean verify
+          elif [ -f "build.gradle" ]; then
+            ./gradlew clean build
+          else
+            echo "No Java build file found, skipping"
+          fi
+
+      - name: OWASP Dependency Check (Java)
+        uses: dependency-check/Dependency-Check_Action@v3
+        with:
+          project: "springboot-app"
+          path: "."
+          format: "HTML"
+        continue-on-error: false
+
+      # --------------------------------------------------
+      # SonarCloud – Code Quality Gate
+      # --------------------------------------------------
+      #- name: SonarCloud Scan
+      #  uses: SonarSource/sonarcloud-github-action@v2
+      #  env:
+      #    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      # --------------------------------------------------
+      # Node / React
+      # --------------------------------------------------
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Install Node dependencies
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci
+          else
+            echo "No package.json found, skipping"
+          fi
+
+      - name: ESLint (React / JS)
+        run: |
+          if [ -f "package.json" ]; then
+            npm run lint || exit 1
+          fi
+
+      - name: npm audit (High & Critical)
+        run: |
+          if [ -f "package.json" ]; then
+            npm audit --audit-level=high
+          fi
+
+      # --------------------------------------------------
+      # Python
+      # --------------------------------------------------
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install Python dependencies
+        run: |
+          if [ -f "requirements.txt" ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Bandit – Python Security
+        run: bandit -r . -ll
+
+      - name: Flake8 – Python Lint
+        run: flake8 . || true
+
+      - name: pip-audit – Dependency Vulnerabilities
+        run: |
+          if [ -f "requirements.txt" ]; then
+            pip install pip-audit
+            pip-audit
+          fi
+
+      # --------------------------------------------------
+      # Frontend Performance (Optional – PR only)
+      # --------------------------------------------------
+      - name: Lighthouse CI
+        if: github.event_name == 'pull_request'
+        uses: treosh/lighthouse-ci-action@v11
+        with:
+          urls: |
+            http://localhost:3000
+        continue-on-error: true
+
+      # --------------------------------------------------
+      # Final Gate
+      # --------------------------------------------------
+      - name: Validation Summary
+        run: |
+          echo "✅ Security scans completed"
+          echo "✅ Code quality checks completed"
+          echo "✅ Dependency audits completed"
