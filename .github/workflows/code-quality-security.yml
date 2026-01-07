@@ -9,7 +9,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: your-org/github-devsecops-action@v1
+      - uses: ./.github/actions/devsecops-validator
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
