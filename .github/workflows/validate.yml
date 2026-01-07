@@ -19,4 +19,4 @@ jobs:
           ls -R .github || true
 
       - name: Run DevSecOps Validator
-        uses: ./.github/actions/devsecops-validator
+        uses: ./.github/actions/devsecops-validator/action.yml
